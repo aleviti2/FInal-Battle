@@ -1,0 +1,27 @@
+//int totalCHaracters = CharactersNumber;
+
+        //    while (totalCHaracters >0)
+        //    {
+        //        if (availableHeroes.Count > 0)
+        //        {
+        //            int randomIndexH = random.Next(0, availableHeroes.Count);
+        //            ICharacter randomHero = availableHeroes[randomIndexH];
+        //            if (!TurnList.Contains(randomHero))
+        //            {
+        //                TurnList.Add(randomHero);
+        //                availableHeroes.Remove(randomHero);
+        //                totalCHaracters--;
+        //            }
+        //        }
+        //        if (availableMonsters.Count > 0 && totalCHaracters > 0)
+        //        {
+        //            int randomIndexM = random.Next(0, availableMonsters.Count );
+        //            ICharacter randomMonster = availableMonsters[randomIndexM];
+        //            if (!TurnList.Contains(randomMonster))
+        //            {
+        //                TurnList.Add(randomMonster);
+        //                availableMonsters.Remove(randomMonster);
+        //                totalCHaracters--;
+        //            }
+        //        }
+        //    }

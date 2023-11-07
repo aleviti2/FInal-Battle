@@ -11,6 +11,7 @@
     {
         HP = hp;
         BattlesWon = battlesWon;
+        Name = "Skelly";
         AttackT = new List<AttackType>
         {
             AttackType.BoneCrunch

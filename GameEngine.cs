@@ -1,19 +1,20 @@
 ﻿using System.Linq.Expressions;
 using System.Reflection.Metadata.Ecma335;
+using System.Security.Cryptography.X509Certificates;
 using System.Xml.Linq;
 
 public class GameEngine
 {
     public int CharactersNumber { get; private set; }
+    public int HeroesNumber { get; private set; }
     public List<ICharacter> TurnList { get; set; }
     public Skeleton skeleton1 { get; set; }
     public Skeleton skeleton2 { get; set; }
     public TheUncodedOne uncodedOne { get; set; }
     public Party Party { get; set; }
-    public GameEngine(Party party, int charactersNumber) 
+    public GameEngine(Party party) 
     {
         Party = party;
-        CharactersNumber = charactersNumber;
         TurnList = new List<ICharacter>();
 
         party.AddCharacter(skeleton1 = new Skeleton(5, 0));
@@ -22,16 +23,22 @@ public class GameEngine
 
          
     }
+    public int SetHeroesNumber()
+    {
+        Console.WriteLine("Welcome to the dungeon valiant heroes. Enter the number of players");
+        HeroesNumber = Convert.ToInt32(Console.ReadLine());
+        return HeroesNumber;
+    }
     public void ChooseHeroes()
     {
-        Console.WriteLine("How many heroes are there? Enter '1' or '2':");
-        int playersN = Convert.ToInt32(Console.ReadLine());
+        //Console.WriteLine("How many heroes are there? Enter '1' or '2':");
+        //int playersN = Convert.ToInt32(Console.ReadLine());
 
-        Console.WriteLine($"You entered: {playersN}"); // Debug output
+        Console.WriteLine($"You entered: {HeroesNumber}"); // Debug output
 
-        if (playersN == 2)
+        if (HeroesNumber == 2)
         {
-            for (int i = 0; i < playersN; i++)
+            for (int i = 0; i < HeroesNumber; i++)
             {
                 Hero hero;
                 if (i == 0)
@@ -46,10 +53,9 @@ public class GameEngine
                 Party.AddCharacter(hero);
             }
         }
-        else if (playersN == 1)
+        else if (HeroesNumber == 1)
         {
             Hero hero = new Hero(5, 0, CharacterType.VinFletcher);
-            Console.WriteLine("Choose your battle name, valiant warrior, then press enter.");
             hero.GiveName();
             Party.AddCharacter(hero);
         }
@@ -60,45 +66,32 @@ public class GameEngine
         }
         
     }
+    public static void Shuffle<T> (List<T> list) //Fisher-Yates shuffle
+    {
+        Random random = new Random();
+        int n = list.Count;      
+        while (n >1) 
+        {
+            n--;
+            int k = random.Next(n +1);
+            T value = list[k];
+            list[k] = list[n];
+            list[n] = value;
+        }
+    }
+
     public List<ICharacter> CreateTurnList()
     {
         TurnList.Clear();
-        Random random = new Random();
         List<ICharacter> availableHeroes = new List<ICharacter>(Party.HeroesParty);
+        Shuffle(availableHeroes);
         List<ICharacter> availableMonsters = new List<ICharacter>(Party.MonstersParty);
-
-        int totalCHaracters = CharactersNumber;
-        
-            while (totalCHaracters >0)
-            {
-                if (availableHeroes.Count > 0)
-                {
-                    int randomIndexH = random.Next(0, availableHeroes.Count - 1);
-                    ICharacter randomHero = availableHeroes[randomIndexH];
-                    if (!TurnList.Contains(randomHero))
-                    {
-                        TurnList.Add(randomHero);
-                        availableHeroes.Remove(randomHero);
-                        totalCHaracters--;
-                    }
-                }
-                if (availableMonsters.Count > 0)
-                {
-                    int randomIndexM = random.Next(0, availableMonsters.Count - 1);
-                    ICharacter randomMonster = availableMonsters[randomIndexM];
-                    if (!TurnList.Contains(randomMonster))
-                    {
-                        TurnList.Add(randomMonster);
-                        availableMonsters.Remove(randomMonster);
-                        totalCHaracters--;
-                    }
-                }
-            }
-        
+        Shuffle(availableMonsters);
+        TurnList = availableHeroes.Concat(availableMonsters).ToList();
         Console.WriteLine("This is the Turn List:");
         foreach (ICharacter character in TurnList)
         {        
-            Console.WriteLine(character.CharacterCategory);       
+            Console.WriteLine(character.Name, character.CharacterCategory);       
         }
         return TurnList;
     }
@@ -126,12 +119,13 @@ public class GameEngine
                             }
                             Console.WriteLine("Type the Name of the monster you want to attack, then press Enter");
                             string inputCharacterAttacked = Console.ReadLine();
-                            ICharacter targetMonster = Party.MonstersParty.FirstOrDefault(monster => monster.Name == inputCharacterAttacked.ToLower()); //LINQ method that returns the first element in a sequence that satisfies a specified condition.FirstOrDefault iterates through the elements in the collection.
+                            ICharacter targetMonster = Party.MonstersParty.FirstOrDefault(monster => monster.Name == inputCharacterAttacked); //LINQ method that returns the first element in a sequence that satisfies a specified condition.FirstOrDefault iterates through the elements in the collection.
                             //if (targetMonster == null) continue;
+                            Console.WriteLine($"{targetMonster.Name}");
                             Console.WriteLine($"What kind of Attack would you like to perform? You have:");                                                                                                                                                  //For each element, it applies the condition specified in the lambda expression.
-                            foreach (AttackType attacks in character.AttackT)
+                            foreach (AttackType attack in character.AttackT)
                             {
-                                Console.WriteLine(character.AttackT);
+                                Console.WriteLine($"{attack}");
                             }
                             string inputAttack = Console.ReadLine();
                             AttackType attackSelected = character.AttackT.FirstOrDefault(attack => attack.ToString() == inputAttack);
