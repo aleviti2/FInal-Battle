@@ -4,7 +4,7 @@
     public string Name { get; set; } = "Mephisto";
     public int BattlesWon { get; set; }
     public List<AttackType> AttackT { get; set; }
-    public Category CharacterCategory { get; set; }
+    public Category CharacterCategory { get; } = Category.TheUncodedOne;
     public bool IsDead { get; set; }
     public bool Turn { get; set; }
     public TheUncodedOne(int hp, int battlesWon)
