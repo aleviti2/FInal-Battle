@@ -7,11 +7,11 @@
     public Category CharacterCategory { get; } = Category.Skeleton;
     public bool IsDead { get; set; }
     public bool Turn { get; set; }
-    public Skeleton (int hp, int battlesWon)
+    public Skeleton (int hp, int battlesWon, string name)
     {
         HP = hp;
         BattlesWon = battlesWon;
-        Name = "Skelly";
+        Name = name;
         AttackT = new List<AttackType>
         {
             AttackType.BoneCrunch
