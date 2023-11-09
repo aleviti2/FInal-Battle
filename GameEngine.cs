@@ -95,16 +95,15 @@ public class GameEngine
     {
 
         Actions actions = new Actions();
-        while (Party.HeroesParty.Any(hero => !hero.IsDead) && Party.MonstersParty.Any(monster => !monster.IsDead)) // LINQ query expression
+        List<ICharacter> turnListCopy = new List<ICharacter>(TurnList);
+
+        while (turnListCopy.Count > 0)// LINQ query expression
         {
-            //if (Party.HeroesParty.All(hero => hero.IsDead) || Party.MonstersParty.All(monster => monster.IsDead))
-            //{
-            //    break;
-            //}
-            foreach (ICharacter character in TurnList.Where(ch => !ch.IsDead))
+            if (Party.HeroesParty.Count ==0/*All(hero => hero.IsDead)*/ || Party.MonstersParty.Count ==0)
+                break;
+            foreach (ICharacter character in turnListCopy.Where(ch => !ch.IsDead))
             {
-                //if (character.IsDead)
-                //    continue;
+
                 Console.WriteLine($"It's {character.Name}'s turn. Your health points are {character.HP}. Do you want to 'do nothing' or 'attack'?");
                 string input = Console.ReadLine();
                 switch (input.ToLower())
@@ -118,22 +117,22 @@ public class GameEngine
                             AttackTarget(character, Party.MonstersParty, actions);
                         else AttackTarget(character, Party.HeroesParty, actions);
 
-                        break;
+                        continue;
 
                 }
             }
         }
-            
-            if (Party.HeroesParty.Any(hero => !hero.IsDead) && Party.MonstersParty.All(monster => monster.IsDead))
-            {
-                if (Party.HeroesParty.Count > 1)
-                    Console.WriteLine($"Congratulations! The {(Party.HeroesParty[0]).CharacterCategory}s prevailed.The winners are {(Party.HeroesParty[0]).Name} and {(Party.HeroesParty[1])}.");
-                else if (Party.HeroesParty.Count == 1 && Party.MonstersParty.All(monster => monster.IsDead))
-                    Console.WriteLine($"Congratulations! The {(Party.HeroesParty[0]).CharacterCategory}s prevailed.The winner is {(Party.HeroesParty[0]).Name}");
-            }
-            else if (Party.MonstersParty.Any(monster => !monster.IsDead) && Party.HeroesParty.All(hero => hero.IsDead))
-                Console.WriteLine("The Monsters have prevailed!");
-        
+
+        if (Party.HeroesParty.Any(hero => !hero.IsDead) && Party.MonstersParty.All(monster => monster.IsDead))
+        {
+            if (Party.HeroesParty.Count > 1)
+                Console.WriteLine($"Congratulations! The {(Party.HeroesParty[0]).CharacterCategory}s prevailed.The winners are {(Party.HeroesParty[0]).Name} and {(Party.HeroesParty[1])}.");
+            else if (Party.HeroesParty.Count == 1 && Party.MonstersParty.All(monster => monster.IsDead))
+                Console.WriteLine($"Congratulations! The {(Party.HeroesParty[0]).CharacterCategory}s prevailed.The winner is {(Party.HeroesParty[0]).Name}");
+        }
+        else if (Party.MonstersParty.Any(monster => !monster.IsDead) && Party.HeroesParty.All(hero => hero.IsDead))
+            Console.WriteLine("The Monsters have prevailed!");
+    
     }
     public void AttackTarget(ICharacter attacker, List<ICharacter> targets, Actions action)
     {
@@ -186,28 +185,31 @@ public class GameEngine
             cAttacked.IsDead = true;
             Console.WriteLine($"Your opponent {cAttacked.Name} has been killed.");
             ICharacter turnListCharacter = TurnList.FirstOrDefault(character => character.Name == cAttacked.Name);
+            TurnList.Remove(cAttacked);
+            if (cAttacked.CharacterCategory == Category.Hero)
+                Party.HeroesParty.Remove(cAttacked);
+            else Party.MonstersParty.Remove(cAttacked);
+            
             if (turnListCharacter != null)
             {
                 turnListCharacter.IsDead = true;
             }
             foreach (ICharacter ch in Party.HeroesParty)
             {
-                Console.WriteLine($"{ch.Name} is dead? {ch.IsDead}");
+                Console.WriteLine($"{ch.Name} in HeroesParty is dead? {ch.IsDead}. The number of heroes in the list is {Party.HeroesParty.Count}");
             }
             foreach (ICharacter ch in Party.MonstersParty)
             {
-                Console.WriteLine($"{ch.Name} is dead? {ch.IsDead}");
+                Console.WriteLine($"{ch.Name} in MonsterParty is dead? {ch.IsDead}. The number of monsters in the list is {Party.MonstersParty.Count}");
             }
             foreach (ICharacter ch in TurnList)
             {
-                Console.WriteLine($"{ch.Name} in TurnList is dead? {ch.IsDead}");
+                Console.WriteLine($"{ch.Name} in TurnList is dead? {ch.IsDead}. The number of characters in the Turnlist is {TurnList.Count}");
             }
-            return true;
-
-            //if (cAttacked.CharacterCategory == Category.Hero)
-            //    Party.HeroesParty.Remove(cAttacked);
-            //else Party.MonstersParty.Remove(cAttacked);
             
+
+            
+            return true;
         }
         return false;
     }   
