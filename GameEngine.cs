@@ -97,14 +97,20 @@ public class GameEngine
         Actions actions = new Actions();
         List<ICharacter> turnListCopy = new List<ICharacter>(TurnList);
 
-        while (turnListCopy.Count > 0)// LINQ query expression
+        while (turnListCopy.Any(character => !character.IsDead))// LINQ query expression
         {
-            if (Party.HeroesParty.Count ==0/*All(hero => hero.IsDead)*/ || Party.MonstersParty.Count ==0)
+            Console.WriteLine($"The turnListCOPY contains {turnListCopy.Count}");
+
+            if (Party.HeroesParty.Count < 1 || Party.MonstersParty.Count < 1)
+            {
+                Console.WriteLine($"Exiting while loop");
                 break;
+            }
+            Console.WriteLine($"The HeroesParty list contains {Party.HeroesParty.Count}. The MonsterParty list contains {Party.MonstersParty.Count}");
             foreach (ICharacter character in turnListCopy.Where(ch => !ch.IsDead))
             {
 
-                Console.WriteLine($"It's {character.Name}'s turn. Your health points are {character.HP}. Do you want to 'do nothing' or 'attack'?");
+                Console.WriteLine($"It's {character.Name}'s turn. Their health points are {character.HP}. Do you want to 'do nothing' or 'attack'?");
                 string input = Console.ReadLine();
                 switch (input.ToLower())
                 {
@@ -114,9 +120,17 @@ public class GameEngine
                     case "attack":
 
                         if (character.CharacterCategory == Category.Hero)
+                        {
+                            Console.WriteLine("Attacking a monster");
                             AttackTarget(character, Party.MonstersParty, actions);
-                        else AttackTarget(character, Party.HeroesParty, actions);
-
+                            
+                        }
+                        else
+                        {
+                            Console.WriteLine("Attacking a hero");
+                            AttackTarget(character, Party.HeroesParty, actions);
+                            
+                        }
                         continue;
 
                 }
@@ -184,31 +198,31 @@ public class GameEngine
         {
             cAttacked.IsDead = true;
             Console.WriteLine($"Your opponent {cAttacked.Name} has been killed.");
-            ICharacter turnListCharacter = TurnList.FirstOrDefault(character => character.Name == cAttacked.Name);
-            TurnList.Remove(cAttacked);
-            if (cAttacked.CharacterCategory == Category.Hero)
-                Party.HeroesParty.Remove(cAttacked);
-            else Party.MonstersParty.Remove(cAttacked);
+           
+                ICharacter turnListHero = Party.HeroesParty.FirstOrDefault(character => character.Name == cAttacked.Name);
+            //turnListCharacter.IsDead = true;
             
-            if (turnListCharacter != null)
+            if (turnListHero != null)
             {
-                turnListCharacter.IsDead = true;
+                turnListHero.IsDead = true;
+            }
+            ICharacter turnListMonster = Party.MonstersParty.FirstOrDefault(character => character.Name == cAttacked.Name);
+            if (turnListMonster != null)
+            {
+                turnListMonster.IsDead = true;
             }
             foreach (ICharacter ch in Party.HeroesParty)
             {
-                Console.WriteLine($"{ch.Name} in HeroesParty is dead? {ch.IsDead}. The number of heroes in the list is {Party.HeroesParty.Count}");
+                Console.WriteLine($"{ch.Name} in HeroesParty is dead? {ch.IsDead}.");
             }
             foreach (ICharacter ch in Party.MonstersParty)
             {
-                Console.WriteLine($"{ch.Name} in MonsterParty is dead? {ch.IsDead}. The number of monsters in the list is {Party.MonstersParty.Count}");
+                Console.WriteLine($"{ch.Name} in MonsterParty is dead? {ch.IsDead}.");
             }
             foreach (ICharacter ch in TurnList)
             {
-                Console.WriteLine($"{ch.Name} in TurnList is dead? {ch.IsDead}. The number of characters in the Turnlist is {TurnList.Count}");
-            }
-            
-
-            
+                Console.WriteLine($"{ch.Name} in TurnList is dead? {ch.IsDead}.");
+            } 
             return true;
         }
         return false;
