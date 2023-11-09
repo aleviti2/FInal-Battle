@@ -95,21 +95,22 @@ public class GameEngine
     {
 
         Actions actions = new Actions();
-        List<ICharacter> turnListCopy = new List<ICharacter>(TurnList);
-
-        while (turnListCopy.Any(character => !character.IsDead))// LINQ query expression
+        //List<ICharacter> turnListCopy = new List<ICharacter>(TurnList);
+        bool exitBothLoops = false;
+        while (true)
         {
-            Console.WriteLine($"The turnListCOPY contains {turnListCopy.Count}");
+            Console.WriteLine($"The turnListCOPY contains {TurnList.Count}");
 
-            if (Party.HeroesParty.Count < 1 || Party.MonstersParty.Count < 1)
-            {
-                Console.WriteLine($"Exiting while loop");
-                break;
-            }
+            
             Console.WriteLine($"The HeroesParty list contains {Party.HeroesParty.Count}. The MonsterParty list contains {Party.MonstersParty.Count}");
-            foreach (ICharacter character in turnListCopy.Where(ch => !ch.IsDead))
+            foreach (ICharacter character in TurnList.Where(ch => !ch.IsDead))
             {
-
+                if (Party.HeroesParty.All(hero => hero.IsDead) || Party.MonstersParty.All(monster => monster.IsDead))
+                {
+                    Console.WriteLine($"Exiting both loops");
+                    exitBothLoops = true;
+                    break;
+                }
                 Console.WriteLine($"It's {character.Name}'s turn. Their health points are {character.HP}. Do you want to 'do nothing' or 'attack'?");
                 string input = Console.ReadLine();
                 switch (input.ToLower())
@@ -134,6 +135,10 @@ public class GameEngine
                         continue;
 
                 }
+            }
+            if (exitBothLoops)
+            {
+                break; // Exit both loops
             }
         }
 
