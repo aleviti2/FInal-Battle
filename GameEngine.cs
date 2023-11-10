@@ -19,7 +19,10 @@ public class GameEngine
         party.AddCharacter(skeleton1 = new Skeleton(1, 0, "Gomer"));
         party.AddCharacter(skeleton2 = new Skeleton(1, 0, "Nefasto"));
         party.AddCharacter(uncodedOne = new TheUncodedOne(1, 0));
+    }
 
+    public GameEngine(GameEngine previousGame, List<ICharacter> newMonsters)
+    {
 
     }
     public int SetHeroesNumber()
@@ -107,7 +110,7 @@ public class GameEngine
             {
                 if (Party.HeroesParty.All(hero => hero.IsDead) || Party.MonstersParty.All(monster => monster.IsDead))
                 {
-                    Console.WriteLine($"Exiting both loops");
+                    //Console.WriteLine($"Exiting both loops");
                     exitBothLoops = true;
                     break;
                 }
@@ -144,8 +147,8 @@ public class GameEngine
 
         if (Party.HeroesParty.Any(hero => !hero.IsDead) && Party.MonstersParty.All(monster => monster.IsDead))
         {
-            if (Party.HeroesParty.Count > 1)
-                Console.WriteLine($"Congratulations! The {(Party.HeroesParty[0]).CharacterCategory}s prevailed.The winners are {(Party.HeroesParty[0]).Name} and {(Party.HeroesParty[1])}.");
+            if (Party.HeroesParty.Count == 2)
+                Console.WriteLine($"Congratulations! The {(Party.HeroesParty[0]).CharacterCategory}s prevailed.The winners are {(Party.HeroesParty[0]).Name} and {(Party.HeroesParty[1]).Name}.");
             else if (Party.HeroesParty.Count == 1 && Party.MonstersParty.All(monster => monster.IsDead))
                 Console.WriteLine($"Congratulations! The {(Party.HeroesParty[0]).CharacterCategory}s prevailed.The winner is {(Party.HeroesParty[0]).Name}");
         }
@@ -216,18 +219,18 @@ public class GameEngine
             {
                 turnListMonster.IsDead = true;
             }
-            foreach (ICharacter ch in Party.HeroesParty)
-            {
-                Console.WriteLine($"{ch.Name} in HeroesParty is dead? {ch.IsDead}.");
-            }
-            foreach (ICharacter ch in Party.MonstersParty)
-            {
-                Console.WriteLine($"{ch.Name} in MonsterParty is dead? {ch.IsDead}.");
-            }
-            foreach (ICharacter ch in TurnList)
-            {
-                Console.WriteLine($"{ch.Name} in TurnList is dead? {ch.IsDead}.");
-            } 
+            //foreach (ICharacter ch in Party.HeroesParty)
+            //{
+            //    Console.WriteLine($"{ch.Name} in HeroesParty is dead? {ch.IsDead}.");
+            //}
+            //foreach (ICharacter ch in Party.MonstersParty)
+            //{
+            //    Console.WriteLine($"{ch.Name} in MonsterParty is dead? {ch.IsDead}.");
+            //}
+            //foreach (ICharacter ch in TurnList)
+            //{
+            //    Console.WriteLine($"{ch.Name} in TurnList is dead? {ch.IsDead}.");
+            //} 
             return true;
         }
         return false;

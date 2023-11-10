@@ -25,3 +25,30 @@
         //            }
         //        }
         //    }
+
+Right, but if you don't have a catch, the program doesn't try again. It just crashes. So you'd want to do something like this:
+int GetANumber()
+{
+    while (true)
+    {
+        int result;
+        try
+        {
+            Console.WriteLine("Give me a number.");
+            string? input = Console.ReadLine();
+            result = Convert.ToInt32(input);
+            return result;
+        }
+        catch (FormatException)
+        {
+            Console.WriteLine("That wasn't a number. Try again.");
+        }
+    }
+}
+
+You could actually simplify that by removing the result variable and just returning it. If all goes according to plan, this code will run the body of that loop once and return the result. If they enter bad input, then instead of crashing, it will catch the exception, display a message saying it was bad and to try again, and then loop around again to ask. That repeats until they finally give a good answer.
+
+This is the type of place where exceptions are useful. Convert.ToInt32 has no clue how to respond to bad input here, and can't fix the problem. So it must error out. But your code likely does know what to do. (In this case, get another string from the user and try again.)
+
+Big caveat: this code will work, but int.TryParse was covered in the "Advanced Methods" level, and I'd typically use that instead of try/catch, because it is simpler code. So in this case, there's a shortcut that is better. But other situations don't always have the shortcut.
+The messiness of handling bad user input is why I so often say to ignore it in the early part of the book. Just assume the user (really, just you) will either get it right or know how to run it again, and that the cost of doing it wrong is very low. Keeps the code simple and focused on the skills you're learning. I write plenty of utilities where I still follow that philosophy. But with "real" programs with higher stakes, you'll just need to do the right thing and handle bad user input and protect the program from crashing.
