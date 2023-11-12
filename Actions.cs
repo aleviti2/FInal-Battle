@@ -20,4 +20,10 @@
         characterMisty.HP -= pointsTaken;
         Console.WriteLine($"{characterMisty.Name} has lost {pointsTaken} health point. Points remaining {characterMisty.HP}");
     }
+
+    public void Claw(ICharacter characterClawed)
+    {
+        characterClawed.HP -= 2;
+        Console.WriteLine($"{characterClawed.Name} has lost {1} health point. Points remaining {characterClawed.HP}");
+    }
 }

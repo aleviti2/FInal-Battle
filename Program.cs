@@ -1,8 +1,9 @@
 ﻿using System.Collections.Generic;
 
 Party party = new Party();
-GameEngine gameEngine = new GameEngine(party);
 
+GameEngine gameEngine = new GameEngine(party);
+BattleSeries bSerie = new BattleSeries(gameEngine); //maybe delete
 gameEngine.SetHeroesNumber();
 gameEngine.ChooseHeroes();
 
@@ -21,6 +22,6 @@ party.AllCharactersList = party.MergeLists(party.HeroesParty, party.MonstersPart
 gameEngine.CreateTurnList();
 
 gameEngine.TurnsManager();
-public enum AttackType { Punch, BoneCrunch, MistyFist}
+public enum AttackType { Punch, BoneCrunch, Claw, MistyFist}
 public enum CharacterType { VinFletcher, Tog}
-public enum Category { Hero, Skeleton, TheUncodedOne}
+public enum Category { Hero, Skeleton, Werewolf, TheUncodedOne}

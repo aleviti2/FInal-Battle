@@ -7,24 +7,62 @@ public class GameEngine
     public int CharactersNumber { get; private set; }
     public int HeroesNumber { get; private set; }
     public List<ICharacter> TurnList { get; set; }
-    public Skeleton skeleton1 { get; set; }
-    public Skeleton skeleton2 { get; set; }
+    //public Skeleton skeleton1 { get; set; }
+    //public Skeleton skeleton2 { get; set; }
     public TheUncodedOne uncodedOne { get; set; }
     public Party Party { get; set; }
-    public GameEngine(Party party)
+    public BattleSeries battleSeries { get; set; }
+
+    public event Action? BattleEnded;
+
+    public GameEngine(Party party) //First battle
     {
         Party = party;
         TurnList = new List<ICharacter>();
+        //this.battleSeries = battleSeries;
 
-        party.AddCharacter(skeleton1 = new Skeleton(1, 0, "Gomer"));
-        party.AddCharacter(skeleton2 = new Skeleton(1, 0, "Nefasto"));
-        party.AddCharacter(uncodedOne = new TheUncodedOne(1, 0));
+        party.AddCharacter(/*skeleton1 = */new Skeleton(1, 0, "Gomer"));
+        party.AddCharacter(/*skeleton2 = */new Skeleton(1, 0, "Nefasto"));
+        //party.AddCharacter(uncodedOne = new TheUncodedOne(1, 0));
+        battleSeries = new BattleSeries(this);
+        BattleEnded += battleSeries.OnBattleManager;
     }
 
-    public GameEngine(GameEngine previousGame, List<ICharacter> newMonsters)
+    public GameEngine(GameEngine firstGame) //Second Battle
     {
+        this.battleSeries = firstGame.battleSeries;
+        Party = firstGame.Party;
+        TurnList = new List<ICharacter>();
+        BattleEnded += battleSeries.OnBattleManager;
+        List<ICharacter> survivingCharacters = firstGame.Party.HeroesParty.Where(hero => !hero.IsDead).ToList(); // HeroesParty is property of Party property of the firstGame object
 
+        Party.MonstersParty = new List<ICharacter>();        //or Party.MonstersParty.Clear(); 
+
+        Party.AddCharacter(new Werewolf(1, "Remus"));
+        Party.AddCharacter(new Werewolf(1, "Romulus"));
+
+        CreateTurnList();
+        TurnsManager();
+        
     }
+
+    public GameEngine(GameEngine secondGame, ICharacter theUncodedOne) //Final battle
+    {
+        this.battleSeries = secondGame.battleSeries;
+        Party = secondGame.Party;
+        TurnList = new List<ICharacter>();
+        BattleEnded += battleSeries.OnBattleManager;
+        List<ICharacter> survivingCharacters = secondGame.Party.HeroesParty.Where(hero => !hero.IsDead).ToList(); // HeroesParty is property of Party property of the firstGame object
+
+        Party.MonstersParty = new List<ICharacter>();        //or Party.MonstersParty.Clear(); 
+
+        Party.AddCharacter(new TheUncodedOne(1, 0));
+ 
+        CreateTurnList();
+        TurnsManager();
+        
+    }
+  
     public int SetHeroesNumber()
     {
         Console.WriteLine("Welcome to the dungeon valiant heroes. Enter the number of players");
@@ -33,7 +71,7 @@ public class GameEngine
     }
     public void ChooseHeroes()
     {
-        Console.WriteLine($"You entered: {HeroesNumber}"); // Debug output
+        ///*Console.WriteLine($"You entered: {HeroesNumber}"); //*/ Debug output
 
         if (HeroesNumber == 2)
         {
@@ -102,10 +140,10 @@ public class GameEngine
         bool exitBothLoops = false;
         while (true)
         {
-            Console.WriteLine($"The turnListCOPY contains {TurnList.Count}");
+            //Console.WriteLine($"The turnListCOPY contains {TurnList.Count}");
 
             
-            Console.WriteLine($"The HeroesParty list contains {Party.HeroesParty.Count}. The MonsterParty list contains {Party.MonstersParty.Count}");
+            //Console.WriteLine($"The HeroesParty list contains {Party.HeroesParty.Count}. The MonsterParty list contains {Party.MonstersParty.Count}");
             foreach (ICharacter character in TurnList.Where(ch => !ch.IsDead))
             {
                 if (Party.HeroesParty.All(hero => hero.IsDead) || Party.MonstersParty.All(monster => monster.IsDead))
@@ -154,7 +192,9 @@ public class GameEngine
         }
         else if (Party.MonstersParty.Any(monster => !monster.IsDead) && Party.HeroesParty.All(hero => hero.IsDead))
             Console.WriteLine("The Monsters have prevailed!");
-    
+        
+        battleSeries.CurrentBattleNumber++;
+        BattleEnded.Invoke();
     }
     public void AttackTarget(ICharacter attacker, List<ICharacter> targets, Actions action)
     {
