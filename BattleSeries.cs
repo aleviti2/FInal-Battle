@@ -27,8 +27,4 @@ public class BattleSeries
             NewBattle= new GameEngine(GameEngineProperty, UncodedOne);
         }
     }
-
-
-   
-
 }

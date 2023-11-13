@@ -7,7 +7,7 @@ public class Party : IEnumerable<ICharacter>
     public List<ICharacter> MonstersParty { get; set; }
 
 
-    public Party(  )
+    public Party()
     {
         AllCharactersList = new List<ICharacter>();
         HeroesParty = new List<ICharacter>();

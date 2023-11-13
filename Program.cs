@@ -3,7 +3,7 @@
 Party party = new Party();
 
 GameEngine gameEngine = new GameEngine(party);
-BattleSeries bSerie = new BattleSeries(gameEngine); //maybe delete
+/*BattleSeries bSerie = new BattleSeries(gameEngine);*/ //maybe delete
 gameEngine.SetHeroesNumber();
 gameEngine.ChooseHeroes();
 
