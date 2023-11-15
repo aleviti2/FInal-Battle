@@ -8,7 +8,7 @@ gameEngine.SetHeroesNumber();
 gameEngine.ChooseHeroes();
 
 party.AllCharactersList = party.MergeLists(party.HeroesParty, party.MonstersParty);
-
+gameEngine.InitializeBattleSeries();
 
 //foreach (ICharacter character in party.MonstersParty)
 //{
@@ -22,6 +22,7 @@ party.AllCharactersList = party.MergeLists(party.HeroesParty, party.MonstersPart
 gameEngine.CreateTurnList();
 
 gameEngine.TurnsManager();
+gameEngine.InvokeOrEnd();
 public enum AttackType { Punch, BoneCrunch, Claw, MistyFist}
 public enum CharacterType { VinFletcher, Tog}
 public enum Category { Hero, Skeleton, Werewolf, TheUncodedOne}

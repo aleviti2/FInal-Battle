@@ -24,17 +24,17 @@ public class GameEngine
         
         party.AddCharacter(/*skeleton1 = */new Skeleton(1, 0, "Gomer"));
         party.AddCharacter(/*skeleton2 = */new Skeleton(1, 0, "Nefasto"));
-        //party.AddCharacter(uncodedOne = new TheUncodedOne(1, 0));
-        BattleSeries = new BattleSeries(this);
-        BattleEnded += BattleSeries.OnBattleManager;
+        
+        //BattleSeries = new BattleSeries(this);
+        //BattleEnded += BattleSeries.OnBattleManager;
     }
 
     public GameEngine(GameEngine firstGame) //Second Battle
     {
-        this.BattleSeries = firstGame.BattleSeries;                                                             // The first BattleSeries object is reused with all its properties and data. 
+        /*this.BattleSeries = firstGame.BattleSeries;*/                                                             // The first BattleSeries object is reused with all its properties and data. 
         Party = firstGame.Party;                                                                                // The first Party object is reused with all its properties and data. 
         TurnList = new List<ICharacter>();                                                                      // I created a new TurnList property as the characters will be different.
-        BattleEnded += BattleSeries.OnBattleManager;                                                            // I subscribed to the Event BattleEnded.
+        /*BattleEnded += BattleSeries.OnBattleManager;*/                                                            // I subscribed to the Event BattleEnded.
         List<ICharacter> survivingCharacters = firstGame.Party.HeroesParty.Where(hero => !hero.IsDead).ToList();// HeroesParty is property of Party property of the firstGame object, which is transferred into the Party property if this(second) instance of Party
         AliveHeroes = survivingCharacters;                                                                      // The new list of surviving heroes is transferred into AliveHeroes, which is populated only when second GameObject constructor is called.
         Party.MonstersParty = new List<ICharacter>();         
@@ -42,26 +42,41 @@ public class GameEngine
         Party.AddCharacter(new Werewolf(1, "Remus"));
         Party.AddCharacter(new Werewolf(1, "Romulus"));
 
-        CreateTurnList();
-        TurnsManager();
+        //CreateTurnList();
+        //TurnsManager();
         
+    }
+    public void InitializeBattleSeries()
+    {
+        BattleSeries = new BattleSeries(this);
+        BattleEnded += BattleSeries.OnBattleManager;
+    }
+    public void InizializeSecondBattle(GameEngine firstGame)
+    {
+        this.BattleSeries = firstGame.BattleSeries;
+        BattleEnded += BattleSeries.OnBattleManager;
+    }
+    public void InizializeFinalBattle(GameEngine secondGame)
+    {
+        this.BattleSeries = secondGame.BattleSeries;
+        BattleEnded += BattleSeries.OnBattleManager;
     }
 
     public GameEngine(GameEngine secondGame, ICharacter theUncodedOne) //Final battle
     {
-        this.BattleSeries = secondGame.BattleSeries;
+        //this.BattleSeries = secondGame.BattleSeries;
         Party = secondGame.Party;
         TurnList = new List<ICharacter>();
-        BattleEnded += BattleSeries.OnBattleManager;
+        //BattleEnded += BattleSeries.OnBattleManager;
         List<ICharacter> survivingCharacters = secondGame.Party.HeroesParty.Where(hero => !hero.IsDead).ToList(); // HeroesParty is property of Party property of the firstGame object
         AliveHeroes = survivingCharacters;
         Party.MonstersParty = new List<ICharacter>();        //or Party.MonstersParty.Clear(); 
 
         Party.AddCharacter(new TheUncodedOne(1, 0));
- 
-        CreateTurnList();
-        TurnsManager();
-        
+
+        //CreateTurnList();
+        //TurnsManager();
+
     }
   
     public int SetHeroesNumber()
@@ -149,7 +164,7 @@ public class GameEngine
         {
             //Console.WriteLine($"The turnListCOPY contains {TurnList.Count}");
 
-            
+
             //Console.WriteLine($"The HeroesParty list contains {Party.HeroesParty.Count}. The MonsterParty list contains {Party.MonstersParty.Count}");
             foreach (ICharacter character in TurnList.Where(ch => !ch.IsDead))
             {
@@ -172,13 +187,13 @@ public class GameEngine
                         {
                             Console.WriteLine("Attacking a monster");
                             AttackTarget(character, Party.MonstersParty, actions);
-                            
+
                         }
                         else
                         {
                             Console.WriteLine("Attacking a hero");
                             AttackTarget(character, Party.HeroesParty, actions);
-                            
+
                         }
                         continue;
 
@@ -205,16 +220,23 @@ public class GameEngine
         }
         else if (Party.MonstersParty.Any(monster => !monster.IsDead) && Party.HeroesParty.All(hero => hero.IsDead))
             Console.WriteLine("The Monsters have prevailed!");
-
+    }
+    public void InvokeOrEnd()
+    { 
+        //Console.WriteLine($"WE JUST FINISHED BATTLE n {BattleSeries.CurrentBattleNumber}");
         BattleSeries.CurrentBattleNumber++;
+        Console.WriteLine($"WE are ABOUT TO START BATTLE n {BattleSeries.CurrentBattleNumber}");
         if (BattleSeries.CurrentBattleNumber < 4 && Party.HeroesParty.Any(hero => !hero.IsDead))
         { 
             BattleEnded.Invoke();
+            
         }
         else
         {
             Console.WriteLine("The game has concluded.");
+            
         }
+        
     }
     public void AttackTarget(ICharacter attacker, List<ICharacter> targets, Actions action)
     {

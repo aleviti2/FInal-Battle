@@ -3,6 +3,8 @@
 public class BattleSeries
 { 
     public GameEngine GameEngineProperty { get; set; }
+    public GameEngine SecondBattle { get; set; }
+    public GameEngine ThirdBattle { get; set; }
     public GameEngine NewBattle { get; set; }
     public int CurrentBattleNumber { get; set; } = 1;
     (string, int, int) ScoresByPlayer { get; set; }
@@ -12,19 +14,34 @@ public class BattleSeries
         GameEngineProperty = engine;
         //engine.BattleEnded += OnBattleManager;
     }
+    public void BattleCounter()
+    {
 
+    }
     public void OnBattleManager() => ResetToNewBattle();
     
     public void ResetToNewBattle()
     {
         if (CurrentBattleNumber == 2)
         {
-            NewBattle = new GameEngine(GameEngineProperty);
+            
+            SecondBattle = new GameEngine(GameEngineProperty);          
+            SecondBattle.InizializeSecondBattle(GameEngineProperty);
+            SecondBattle.CreateTurnList();
+            SecondBattle.TurnsManager();
+            SecondBattle.InvokeOrEnd();
+            return;
         }
-        if (CurrentBattleNumber == 3) 
+        else if (CurrentBattleNumber == 3) 
         {
-            UncodedOne = new TheUncodedOne(1, 0);
-            NewBattle= new GameEngine(GameEngineProperty, UncodedOne);
+            
+            //UncodedOne = new TheUncodedOne(1, 0);
+            ThirdBattle = new GameEngine(SecondBattle, UncodedOne);
+            ThirdBattle.InizializeFinalBattle(SecondBattle);
+            ThirdBattle.CreateTurnList();
+            ThirdBattle.TurnsManager();
+            ThirdBattle.InvokeOrEnd();
+            return;
         }
     }
 }
