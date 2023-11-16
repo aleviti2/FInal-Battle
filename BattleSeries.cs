@@ -4,7 +4,7 @@ public class BattleSeries
     public GameEngine GameEngineProperty { get; set; }
     public GameEngine SecondBattle { get; set; }
     public GameEngine ThirdBattle { get; set; }
-    public GameEngine NewBattle { get; set; }
+    //public GameEngine NewBattle { get; set; }
     public int CurrentBattleNumber { get; set; } = 1;
     (string, int, int) ScoresByPlayer { get; set; }
     public TheUncodedOne UncodedOne { get; set; }
@@ -24,7 +24,7 @@ public class BattleSeries
         if (CurrentBattleNumber == 2)
         {
             
-            SecondBattle = new GameEngine(GameEngineProperty);          
+            SecondBattle = new GameEngine(GameEngineProperty ,new List<ICharacter> { new Werewolf(1,0,"Romulus"), new Werewolf(1, 0, "Remus")});          
             SecondBattle.InizializeSecondBattle(GameEngineProperty);
             SecondBattle.CreateTurnList();
             SecondBattle.TurnsManager();
@@ -35,7 +35,7 @@ public class BattleSeries
         {
             
             //UncodedOne = new TheUncodedOne(1, 0);
-            ThirdBattle = new GameEngine(SecondBattle, UncodedOne);
+            ThirdBattle = new GameEngine(SecondBattle, new List<ICharacter> { new TheUncodedOne(1,0)});
             ThirdBattle.InizializeFinalBattle(SecondBattle);
             ThirdBattle.CreateTurnList();
             ThirdBattle.TurnsManager();

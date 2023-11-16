@@ -2,8 +2,9 @@
 
 Party party = new Party();
 
-GameEngine gameEngine = new GameEngine(party);
-/*BattleSeries bSerie = new BattleSeries(gameEngine);*/ //maybe delete
+GameEngine gameEngine = new GameEngine(party, new List<ICharacter> { new Skeleton(1, 0, "Gomer"), new Skeleton(1, 0, "Nefasto")});
+
+
 gameEngine.SetHeroesNumber();
 gameEngine.ChooseHeroes();
 
@@ -23,6 +24,6 @@ gameEngine.CreateTurnList();
 
 gameEngine.TurnsManager();
 gameEngine.InvokeOrEnd();
-public enum AttackType { Punch, BoneCrunch, Claw, MistyFist}
-public enum CharacterType { VinFletcher, Tog}
-public enum Category { Hero, Skeleton, Werewolf, TheUncodedOne}
+public enum AttackType { Punch, BoneCrunch, Claw, MistyFist }
+public enum CharacterType { VinFletcher, Tog }
+public enum Category { Hero, Skeleton, Werewolf, TheUncodedOne }
