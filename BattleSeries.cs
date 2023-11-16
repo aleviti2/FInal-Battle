@@ -1,5 +1,4 @@
-﻿using System.Security.Cryptography.X509Certificates;
-
+﻿
 public class BattleSeries
 { 
     public GameEngine GameEngineProperty { get; set; }

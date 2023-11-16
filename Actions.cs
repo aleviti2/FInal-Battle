@@ -1,29 +1,55 @@
-﻿public class Actions
+﻿
+public interface IAction
 {
-    public void Punch (ICharacter characterPunched)
-    {     
-        characterPunched.HP -= 1;
-        Console.WriteLine($"{characterPunched.Name} has lost {1} health point. Points remaining {characterPunched.HP}");
-    }
-    public void BoneCrunch (ICharacter characterCrunched)
+    public int HPInflicted { get; set; }
+    public int Hit(ICharacter characterHit);
+}
+
+public class Punch : IAction
+{
+    public int HPInflicted { get; set; } = 1;
+    public int Hit(ICharacter characterHit)
     {
-        Random random = new Random();
-        int pointsTaken = random.Next(0, 2);
-        characterCrunched.HP -= pointsTaken;
-        Console.WriteLine($"{characterCrunched.Name} has lost {pointsTaken} health point. Points remaining {characterCrunched.HP}");
+        int newHP =characterHit.HP - HPInflicted;
+        Console.WriteLine($"{characterHit.Name} has lost {HPInflicted} health point.");
+        return newHP;
     }
 
-    public void MistyFist(ICharacter characterMisty)
+}
+
+public class BoneCrunch : IAction
+{
+    public int HPInflicted { get; set; }
+    public int Hit(ICharacter characterHit)
     {
         Random random = new Random();
-        int pointsTaken = random.Next(0, 3);
-        characterMisty.HP -= pointsTaken;
-        Console.WriteLine($"{characterMisty.Name} has lost {pointsTaken} health point. Points remaining {characterMisty.HP}");
+        HPInflicted = random.Next(0, 2);
+        int newHP = characterHit.HP - HPInflicted;
+        Console.WriteLine($"{characterHit.Name}  has lost  {HPInflicted}  health point.");
+        return newHP;
     }
+}
 
-    public void Claw(ICharacter characterClawed)
+public class Claw : IAction
+{
+    public int HPInflicted { get; set; } = 2;
+    public int Hit(ICharacter characterHit)
     {
-        characterClawed.HP -= 2;
-        Console.WriteLine($"{characterClawed.Name} has lost {1} health point. Points remaining {characterClawed.HP}");
+        int newHP = characterHit.HP - HPInflicted;
+        Console.WriteLine($"{characterHit.Name} has lost {HPInflicted} health point.");
+        return newHP;
+    }
+}
+
+public class MistyFist : IAction
+{
+    public int HPInflicted { get; set; }
+    public int Hit(ICharacter characterHit)
+    {
+        Random random = new Random();
+        HPInflicted = random.Next(0, 3);
+        int newHP = characterHit.HP - HPInflicted;
+        Console.WriteLine($"{characterHit.Name}  has lost  {HPInflicted}  health point.");
+        return newHP;
     }
 }

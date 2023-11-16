@@ -52,3 +52,34 @@ This is the type of place where exceptions are useful. Convert.ToInt32 has no cl
 
 Big caveat: this code will work, but int.TryParse was covered in the "Advanced Methods" level, and I'd typically use that instead of try/catch, because it is simpler code. So in this case, there's a shortcut that is better. But other situations don't always have the shortcut.
 The messiness of handling bad user input is why I so often say to ignore it in the early part of the book. Just assume the user (really, just you) will either get it right or know how to run it again, and that the cost of doing it wrong is very low. Keeps the code simple and focused on the skills you're learning. I write plenty of utilities where I still follow that philosophy. But with "real" programs with higher stakes, you'll just need to do the right thing and handle bad user input and protect the program from crashing.
+
+
+I could talk about this for a long time, but won't. I'll name a couple of things.
+
+One big one is just sloppiness and inconsistency. You use _underscorePrefixed for one private field, InitialCaps for another, and lowerCamelCase for a third. Or you write one like {get;set;} and another like { get; set; } and another like
+{
+    get;
+    set;
+}
+
+You put a blank line between some methods and not others. You use var and explicit types for different variables without any apparent pattern.
+
+That kind of stuff.
+
+If you make your code self-consistent, it will look far more professional. It really does matter.
+
+A second thing is that you should generally stick with common C# conventions. As an example, type names are universally UpperCamelCase. You definitely don't want to be inconsistent and sometimes do lowerCamelCase and sometimes do UpperCamelCase. Getting self-consistent is the most important thing. But being consistent with the common conventions is also something to strive for. There may be a few things you prefer to do different. You can probably justify deviating from common conventions on one or two things, if they really bother you that much. Example: In C#, curly braces usually go on the next line:
+public void SomeMethod()
+{
+}
+
+Some people hate that and prefer this:
+public void SomeMethod() {
+}
+
+If you must, you can do the second one, as long as you're consistent. But I'd encourage people to generally follow the C# convention when programming C# (and follow the C/Java/etc. convention when programming in those languages). "When in Rome, do as the Romans do," as they say. At a minimum, at least do most of the things the Romans do, even if there's a few Roman traditions you just can't bring yourself to do. Pick your battles.
+The last thing I'll say is that programmers are looking for code they can quickly understand and change if needed. Code that does something "obviously" inefficient or uses a lot more code than seems necessary will feel less professional. It's hard to say things like, "Use switches instead of ifs," etc. all of these tools exist for a reason, and they'll be the right choice sometimes. So keep an eye out for what options you have and what they each look like.
+
+It helps to look over "good" code written by experienced programmers and experienced programmers in the language you're doing. You'll learn a lot from that.
+
+But everybody understands that there's more than one way to do a thing, and many options can be perfectly reasonable--or that the differences are personal opinion, not law.
