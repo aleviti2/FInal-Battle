@@ -1,12 +1,14 @@
 ﻿
 public interface IAction
 {
+    public string Name { get; set; }
     public int HPInflicted { get; set; }
     public int Hit(ICharacter characterHit);
 }
 
 public class Punch : IAction
 {
+    public string Name { get; set; } = "Punch";
     public int HPInflicted { get; set; } = 1;
     public int Hit(ICharacter characterHit)
     {
@@ -19,6 +21,7 @@ public class Punch : IAction
 
 public class BoneCrunch : IAction
 {
+    public string Name { get; set; } = "BoneCrunch";
     public int HPInflicted { get; set; }
     public int Hit(ICharacter characterHit)
     {
@@ -32,6 +35,7 @@ public class BoneCrunch : IAction
 
 public class Claw : IAction
 {
+    public string Name { get; set; } = "Claw";
     public int HPInflicted { get; set; } = 2;
     public int Hit(ICharacter characterHit)
     {
@@ -43,6 +47,7 @@ public class Claw : IAction
 
 public class MistyFist : IAction
 {
+    public string Name { get; set; } = "MistyFist";
     public int HPInflicted { get; set; }
     public int Hit(ICharacter characterHit)
     {

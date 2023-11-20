@@ -13,6 +13,7 @@ public class GameEngine
     public BoneCrunch BoneCrunch { get; set; }
     public Claw Claw { get; set; }
     public MistyFist MistyFist { get; set; }
+    public bool IsAIActive { get; set; }
     public event Action? BattleEnded;
     
 
@@ -30,24 +31,21 @@ public class GameEngine
         {
             Party.AddCharacter(character);
         }
-        //party.AddCharacter(new Skeleton(1, 0, "Gomer"));
-        //party.AddCharacter(new Skeleton(1, 0, "Nefasto"));
-
     }
 
     public GameEngine(GameEngine previousBattle, List<ICharacter> monsters) //Next Battles
     {
-                                                            // The first BattleSeries object is reused with all its properties and data. 
-        Party = previousBattle.Party;                                                                                // The first Party object is reused with all its properties and data. 
-        TurnList = new List<ICharacter>();                                                                      // I created a new TurnList property as the characters will be different.
-                                                                                                                    /*BattleEnded += BattleSeries.OnBattleManager;*/
+                                                             
+        Party = previousBattle.Party;                                                                                
+        TurnList = new List<ICharacter>();                                                                      
+                                                                                                                   
         Punch = previousBattle.Punch;
         BoneCrunch = previousBattle.BoneCrunch;
         Claw = previousBattle.Claw;
         MistyFist= previousBattle.MistyFist;
-                                                                                                                // I subscribed to the Event BattleEnded.
-        List<ICharacter> survivingCharacters = previousBattle.Party.HeroesParty.Where(hero => !hero.IsDead).ToList();// HeroesParty is property of Party property of the firstGame object, which is transferred into the Party property if this(second) instance of Party
-        AliveHeroes = survivingCharacters;                                                                      // The new list of surviving heroes is transferred into AliveHeroes, which is populated only when second GameObject constructor is called.
+                                                                                                               
+        List<ICharacter> survivingCharacters = previousBattle.Party.HeroesParty.Where(hero => !hero.IsDead).ToList();
+        AliveHeroes = survivingCharacters;                                                                      
         Party.MonstersParty = new List<ICharacter>();         
 
         foreach (ICharacter character in monsters)
@@ -76,6 +74,10 @@ public class GameEngine
     {
         Console.WriteLine("Welcome to the dungeon valiant heroes. Enter the number of players");
         HeroesNumber = Convert.ToInt32(Console.ReadLine());
+        Console.WriteLine("Do you want the monsters to be controlled by an AI?");
+        string input = Console.ReadLine();
+        if (input != null && input == "Yes")
+            IsAIActive= true;
         return HeroesNumber;
     }
     public void ChooseHeroes()
@@ -89,11 +91,11 @@ public class GameEngine
                 Hero hero;
                 if (i == 0)
                 {
-                    hero = new Hero(1, 0, "Hero1", CharacterType.VinFletcher);
+                    hero = new Hero(4, 0, "Hero1", CharacterType.VinFletcher);
                 }
                 else
                 {
-                    hero = new Hero(1, 0, "Hero2", CharacterType.Tog);
+                    hero = new Hero(4, 0, "Hero2", CharacterType.Tog);
                 }
                 hero.GiveName();
                 Party.AddCharacter(hero);
@@ -165,29 +167,35 @@ public class GameEngine
                     exitBothLoops = true;
                     break;
                 }
-                Console.WriteLine($"It's {character.Name}'s turn. Their health points are {character.HP}. Do you want to 'do nothing' or 'attack'?");
-                string input = Console.ReadLine();
-                switch (input.ToLower())
+
+                if (IsAIActive && Party.MonstersParty.Contains(character))
+                    this.Party.AIMonsters(character);
+                else
                 {
-                    case "do nothing":
-                        Console.WriteLine("You've decided to wait.");
-                        continue;
-                    case "attack":
+                    Console.WriteLine($"It's {character.Name}'s turn. Their health points are {character.HP}. Do you want to 'do nothing' or 'attack'?");
+                    string input = Console.ReadLine();
+                    switch (input.ToLower())
+                    {
+                        case "do nothing":
+                            Console.WriteLine("You've decided to wait.");
+                            continue;
+                        case "attack":
 
-                        if (character.CharacterCategory == Category.Hero)
-                        {
-                            Console.WriteLine("Attacking a monster");
-                            AttackTarget(character, Party.MonstersParty);
+                            if (character.CharacterCategory == Category.Hero)
+                            {
+                                Console.WriteLine("Attacking a monster");
+                                AttackTarget(character, Party.MonstersParty);
 
-                        }
-                        else
-                        {
-                            Console.WriteLine("Attacking a hero");
-                            AttackTarget(character, Party.HeroesParty);
+                            }
+                            else
+                            {
+                                Console.WriteLine("Attacking a hero");
+                                AttackTarget(character, Party.HeroesParty);
 
-                        }
-                        continue;
+                            }
+                            continue;
 
+                    }
                 }
             }
             if (exitBothLoops)

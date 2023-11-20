@@ -22,10 +22,11 @@ public class BattleSeries
     public void ResetToNewBattle()
     {
         if (CurrentBattleNumber == 2)
-        {
-            
+        { 
             SecondBattle = new GameEngine(GameEngineProperty ,new List<ICharacter> { new Werewolf(1,0,"Romulus"), new Werewolf(1, 0, "Remus")});          
+            
             SecondBattle.InizializeSecondBattle(GameEngineProperty);
+            SecondBattle.IsAIActive = GameEngineProperty.IsAIActive;
             SecondBattle.CreateTurnList();
             SecondBattle.TurnsManager();
             SecondBattle.InvokeOrEnd();
@@ -33,10 +34,10 @@ public class BattleSeries
         }
         else if (CurrentBattleNumber == 3) 
         {
-            
-            //UncodedOne = new TheUncodedOne(1, 0);
             ThirdBattle = new GameEngine(SecondBattle, new List<ICharacter> { new TheUncodedOne(1,0)});
+
             ThirdBattle.InizializeFinalBattle(SecondBattle);
+            ThirdBattle.IsAIActive = SecondBattle.IsAIActive;
             ThirdBattle.CreateTurnList();
             ThirdBattle.TurnsManager();
             ThirdBattle.InvokeOrEnd();
