@@ -23,7 +23,7 @@ public class BattleSeries
     {
         if (CurrentBattleNumber == 2)
         { 
-            SecondBattle = new GameEngine(GameEngineProperty ,new List<ICharacter> { new Werewolf(1,0,"Romulus"), new Werewolf(1, 0, "Remus")});          
+            SecondBattle = new GameEngine(GameEngineProperty ,new List<ICharacter> { new Werewolf(4,4,1,"Romulus"), new Werewolf(4,4,1,"Remus")});          
             
             SecondBattle.InizializeSecondBattle(GameEngineProperty);
             SecondBattle.IsAIActive = GameEngineProperty.IsAIActive;
@@ -34,7 +34,7 @@ public class BattleSeries
         }
         else if (CurrentBattleNumber == 3) 
         {
-            ThirdBattle = new GameEngine(SecondBattle, new List<ICharacter> { new TheUncodedOne(1,0)});
+            ThirdBattle = new GameEngine(SecondBattle, new List<ICharacter> { new TheUncodedOne(2,2,0)});
 
             ThirdBattle.InizializeFinalBattle(SecondBattle);
             ThirdBattle.IsAIActive = SecondBattle.IsAIActive;

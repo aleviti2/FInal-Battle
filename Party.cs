@@ -48,41 +48,51 @@ public class Party : IEnumerable<ICharacter>
         Random random = new Random();
         Console.WriteLine($"It's {monster.Name}'s turn. Their health points are {monster.HP}");
         Thread.Sleep(1000);
-        Console.WriteLine($"{monster.Name} is getting ready to strike.");
-        Thread.Sleep(3000);
-        List<ICharacter> weakestList = (from o in HeroesParty
-                                        where !o.IsDead
-                                        orderby o.HP
-                                        select o).ToList();
-        ICharacter randomTarget = weakestList[random.Next(weakestList.Count)];
-        //ICharacter randomTarget = weakestList[0];
-        List <AttackType> availableAttacks =    (from o in monster.AttackT
-                                                select o).ToList();
-        List<IAction> listOfActions = new List<IAction>() { new Punch(), new BoneCrunch(), new Claw(), new MistyFist() };
-        List<IAction> listOfavailableActions= new List<IAction>();
-        foreach (AttackType attacktype in availableAttacks)
+        if (monster.HP < 2 && monster.PotionsAvailable > 0)
         {
-            string attackTypeName = attacktype.ToString();
-            IAction matchingAction = listOfActions.FirstOrDefault(action => action.Name == attackTypeName);
-            if (matchingAction != null)
+            HealthPotion healthPotion = new HealthPotion(1);
+            Console.WriteLine($"{monster.Name} has taken a potion to restore its health.");
+            monster.HP = healthPotion.Hit(monster);
+            Console.WriteLine($"Its new HP is {monster.HP}");
+            Thread.Sleep(2000);
+        }
+        else
+        {
+            Console.WriteLine($"{monster.Name} is getting ready to strike.");
+            Thread.Sleep(3000);
+            List<ICharacter> weakestList = (from o in HeroesParty
+                                            where !o.IsDead
+                                            orderby o.HP
+                                            select o).ToList();
+            ICharacter randomTarget = weakestList[random.Next(weakestList.Count)];
+            //ICharacter randomTarget = weakestList[0];
+            List<AttackType> availableAttacks = (from o in monster.AttackT
+                                                 select o).ToList();
+            List<IAction> listOfActions = new List<IAction>() { new Punch(), new BoneCrunch(), new Claw(), new MistyFist() };
+            List<IAction> listOfavailableActions = new List<IAction>();
+            foreach (AttackType attacktype in availableAttacks)
             {
-                listOfavailableActions.Add(matchingAction);
+                string attackTypeName = attacktype.ToString();
+                IAction matchingAction = listOfActions.FirstOrDefault(action => action.Name == attackTypeName);
+                if (matchingAction != null)
+                {
+                    listOfavailableActions.Add(matchingAction);
+                }
             }
-        }
-        List<IAction> strongestActionList = (from o in listOfavailableActions
-                                         orderby o.HPInflicted descending
-                                         select o).ToList();
-        IAction strongestAction = strongestActionList[0];
-        Console.WriteLine($"{monster.Name} is attacking {randomTarget.Name} with a {strongestAction.Name}!");
-        Thread.Sleep(2000);
-        randomTarget.HP =strongestAction.Hit(randomTarget);
-        
-        Console.WriteLine($"{randomTarget.Name}'s HP is now {randomTarget.HP}");
-        if (randomTarget.HP < 1)
-        { 
-            randomTarget.IsDead = true;
-            Console.WriteLine($"{randomTarget.Name} has been killed.");
-        }
-            
+            List<IAction> strongestActionList = (from o in listOfavailableActions
+                                                 orderby o.HPInflicted descending
+                                                 select o).ToList();
+            IAction strongestAction = strongestActionList[0];
+            Console.WriteLine($"{monster.Name} is attacking {randomTarget.Name} with a {strongestAction.Name}!");
+            Thread.Sleep(2000);
+            randomTarget.HP = strongestAction.Hit(randomTarget);
+
+            Console.WriteLine($"{randomTarget.Name}'s HP is now {randomTarget.HP}");
+            if (randomTarget.HP < 1)
+            {
+                randomTarget.IsDead = true;
+                Console.WriteLine($"{randomTarget.Name} has been killed.");
+            }
+        }   
     }
 }

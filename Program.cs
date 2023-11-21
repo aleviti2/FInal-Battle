@@ -2,7 +2,7 @@
 
 Party party = new Party();
 
-GameEngine gameEngine = new GameEngine(party, new List<ICharacter> { new Skeleton(1, 0, "Gomer"), new Skeleton(1, 0, "Nefasto")});
+GameEngine gameEngine = new GameEngine(party, new List<ICharacter> { new Skeleton(4,4, 1, "Gomer"), new Skeleton(4,4, 1, "Nefasto")});
 
 
 gameEngine.SetHeroesNumber();

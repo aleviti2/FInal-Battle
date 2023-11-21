@@ -13,19 +13,21 @@ public class GameEngine
     public BoneCrunch BoneCrunch { get; set; }
     public Claw Claw { get; set; }
     public MistyFist MistyFist { get; set; }
+    public HealthPotion HealthPotion { get; set; }
     public bool IsAIActive { get; set; }
     public event Action? BattleEnded;
-    
+
 
     public GameEngine(Party party, List<ICharacter> monsters) //First battle
     {
         Party = party;
         TurnList = new List<ICharacter>();
-        
+
         Punch = new Punch();
-        BoneCrunch= new BoneCrunch();
+        BoneCrunch = new BoneCrunch();
         Claw = new Claw();
-        MistyFist= new MistyFist();
+        MistyFist = new MistyFist();
+        HealthPotion = new HealthPotion(1);
 
         foreach (ICharacter character in monsters)
         {
@@ -35,24 +37,24 @@ public class GameEngine
 
     public GameEngine(GameEngine previousBattle, List<ICharacter> monsters) //Next Battles
     {
-                                                             
-        Party = previousBattle.Party;                                                                                
-        TurnList = new List<ICharacter>();                                                                      
-                                                                                                                   
+
+        Party = previousBattle.Party;
+        TurnList = new List<ICharacter>();
+
         Punch = previousBattle.Punch;
         BoneCrunch = previousBattle.BoneCrunch;
         Claw = previousBattle.Claw;
-        MistyFist= previousBattle.MistyFist;
-                                                                                                               
+        MistyFist = previousBattle.MistyFist;
+        HealthPotion= previousBattle.HealthPotion;
         List<ICharacter> survivingCharacters = previousBattle.Party.HeroesParty.Where(hero => !hero.IsDead).ToList();
-        AliveHeroes = survivingCharacters;                                                                      
-        Party.MonstersParty = new List<ICharacter>();         
+        AliveHeroes = survivingCharacters;
+        Party.MonstersParty = new List<ICharacter>();
 
         foreach (ICharacter character in monsters)
         {
             Party.AddCharacter(character);
         }
-        
+
     }
     public void InitializeBattleSeries()
     {
@@ -69,7 +71,7 @@ public class GameEngine
         this.BattleSeries = secondGame.BattleSeries;
         BattleEnded += BattleSeries.OnBattleManager;
     }
- 
+
     public int SetHeroesNumber()
     {
         Console.WriteLine("Welcome to the dungeon valiant heroes. Enter the number of players");
@@ -77,7 +79,7 @@ public class GameEngine
         Console.WriteLine("Do you want the monsters to be controlled by an AI?");
         string input = Console.ReadLine();
         if (input != null && input == "Yes")
-            IsAIActive= true;
+            IsAIActive = true;
         return HeroesNumber;
     }
     public void ChooseHeroes()
@@ -91,11 +93,11 @@ public class GameEngine
                 Hero hero;
                 if (i == 0)
                 {
-                    hero = new Hero(4, 0, "Hero1", CharacterType.VinFletcher);
+                    hero = new Hero(4, 4, 1, "Hero1", CharacterType.VinFletcher);
                 }
                 else
                 {
-                    hero = new Hero(4, 0, "Hero2", CharacterType.Tog);
+                    hero = new Hero(4, 4, 1, "Hero2", CharacterType.Tog);
                 }
                 hero.GiveName();
                 Party.AddCharacter(hero);
@@ -103,7 +105,7 @@ public class GameEngine
         }
         else if (HeroesNumber == 1)
         {
-            Hero hero = new Hero(1, 0, "Hero1", CharacterType.VinFletcher);
+            Hero hero = new Hero(4, 4, 1, "Hero1", CharacterType.VinFletcher);
             hero.GiveName();
             Party.AddCharacter(hero);
         }
@@ -134,13 +136,13 @@ public class GameEngine
         //TurnList.Clear();
         if (AliveHeroes == null)
         {
-          availableHeroes = new List<ICharacter>(Party.HeroesParty);
+            availableHeroes = new List<ICharacter>(Party.HeroesParty);
         }
         else { availableHeroes = new List<ICharacter>(AliveHeroes); }
         Shuffle(availableHeroes);
         List<ICharacter> availableMonsters = new List<ICharacter>(Party.MonstersParty);
         Shuffle(availableMonsters);
-       
+
         TurnList = availableHeroes.Concat(availableMonsters).ToList();
         Console.WriteLine("This is the Turn List:");
         foreach (ICharacter character in TurnList)
@@ -163,7 +165,7 @@ public class GameEngine
             {
                 if (Party.HeroesParty.All(hero => hero.IsDead) || Party.MonstersParty.All(monster => monster.IsDead))
                 {
-                    
+
                     exitBothLoops = true;
                     break;
                 }
@@ -172,29 +174,40 @@ public class GameEngine
                     this.Party.AIMonsters(character);
                 else
                 {
-                    Console.WriteLine($"It's {character.Name}'s turn. Their health points are {character.HP}. Do you want to 'do nothing' or 'attack'?");
-                    string input = Console.ReadLine();
-                    switch (input.ToLower())
+                    bool potionTaken = false;
+                    while (!potionTaken)
                     {
-                        case "do nothing":
-                            Console.WriteLine("You've decided to wait.");
-                            continue;
-                        case "attack":
+                        potionTaken = true;
+                        Console.WriteLine($"It's {character.Name}'s turn. Their health points are {character.HP}. Do you want to 'do nothing', 'attack' or 'drink potion?'");
+                        string input = Console.ReadLine();
+                        switch (input.ToLower())
+                        {
+                            case "do nothing":
+                                Console.WriteLine("You've decided to wait.");
+                                continue;
+                            case "attack":
 
-                            if (character.CharacterCategory == Category.Hero)
-                            {
-                                Console.WriteLine("Attacking a monster");
-                                AttackTarget(character, Party.MonstersParty);
-
-                            }
-                            else
-                            {
-                                Console.WriteLine("Attacking a hero");
-                                AttackTarget(character, Party.HeroesParty);
-
-                            }
-                            continue;
-
+                                if (character.CharacterCategory == Category.Hero)
+                                {
+                                    Console.WriteLine("Attacking a monster");
+                                    AttackTarget(character, Party.MonstersParty);
+                                }
+                                else
+                                {
+                                    Console.WriteLine("Attacking a hero");
+                                    AttackTarget(character, Party.HeroesParty);
+                                }
+                                continue;
+                            case "drink potion":
+                                {
+                                    int hpNow = character.HP;
+                                    character.HP = HealthPotion.Hit(character);
+                                    if (hpNow == character.HP)
+                                        potionTaken = false;
+                                    Console.WriteLine($"{character.Name}'s new HP is {character.HP}");
+                                }
+                                continue;
+                        }
                     }
                 }
             }
@@ -221,19 +234,19 @@ public class GameEngine
             Console.WriteLine("The Monsters have prevailed!");
     }
     public void InvokeOrEnd()
-    { 
+    {
         //Console.WriteLine($"WE JUST FINISHED BATTLE n {BattleSeries.CurrentBattleNumber}");
         BattleSeries.CurrentBattleNumber++;
         //Console.WriteLine($"WE are ABOUT TO START BATTLE n {BattleSeries.CurrentBattleNumber}");
         if (BattleSeries.CurrentBattleNumber < 4 && Party.HeroesParty.Any(hero => !hero.IsDead))
-        { 
-            BattleEnded.Invoke();         
+        {
+            BattleEnded.Invoke();
         }
         else
         {
-            Console.WriteLine("The game has concluded.");          
+            Console.WriteLine("The game has concluded.");
         }
-        
+
     }
     public void AttackTarget(ICharacter attacker, List<ICharacter> targets)
     {
@@ -260,7 +273,7 @@ public class GameEngine
         //if (attackSelected == null) continue;
         switch (attackSelected)
         {
-            case AttackType.Punch:             
+            case AttackType.Punch:
                 targetCharacter.HP = Punch.Hit(targetCharacter);
                 break;
             case AttackType.BoneCrunch:
@@ -287,9 +300,9 @@ public class GameEngine
         {
             cAttacked.IsDead = true;
             Console.WriteLine($"Your opponent {cAttacked.Name} has been killed.");
-           
-                ICharacter turnListHero = Party.HeroesParty.FirstOrDefault(character => character.Name == cAttacked.Name);
-            
+
+            ICharacter turnListHero = Party.HeroesParty.FirstOrDefault(character => character.Name == cAttacked.Name);
+
             if (turnListHero != null)
             {
                 turnListHero.IsDead = true;
@@ -299,9 +312,10 @@ public class GameEngine
             {
                 turnListMonster.IsDead = true;
             }
-            
+
             return true;
         }
         return false;
-    }   
+    }
+
 }

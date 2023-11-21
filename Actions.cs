@@ -58,3 +58,33 @@ public class MistyFist : IAction
         return newHP;
     }
 }
+
+public class HealthPotion : IAction
+{
+    public string Name { get; set; } = "Potion";
+    public int HPInflicted { get; set; }
+    public HealthPotion(int hpGained)
+    { 
+        HPInflicted = hpGained;
+    }
+    public int Hit(ICharacter potionOwner)
+    {
+        if ((potionOwner.PotionsAvailable > 0) && (potionOwner.HP < potionOwner.MaxHP))
+        {
+            int nwHP = potionOwner.HP + HPInflicted;
+            Console.WriteLine($"The potion made {potionOwner.Name} regain {HPInflicted} health points!");
+            potionOwner.PotionsAvailable--;
+            return nwHP;
+        }
+        if ((potionOwner.PotionsAvailable > 0) && (potionOwner.HP == potionOwner.MaxHP))
+        {
+            Console.WriteLine("Your HP are already maxed out. No further increase is possible.");
+            return potionOwner.HP;
+        }
+        else 
+        {
+            Console.WriteLine("You don't have any potion available");
+            return potionOwner.HP; 
+        }
+    }
+}
