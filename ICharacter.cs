@@ -9,6 +9,8 @@
     public bool IsDead { get; set; }
     public bool Turn { get; set; }
     public int PotionsAvailable { get; set; }
+    public AttackModifier AttackModifier { get; set; }
+    public int HitsTakenPerBattle { get; set; }
 }
 
 public abstract class Character : ICharacter
@@ -22,6 +24,8 @@ public abstract class Character : ICharacter
     public bool IsDead { get; set; }
     public bool Turn { get; set; }
     public int PotionsAvailable { get; set; }
+    public AttackModifier AttackModifier { get; set; }
+    public int HitsTakenPerBattle { get; set; } = 0;
     public Character ( int hp, int maxHP, int potionsAvailable, string name, Category category)
     {
         HP = hp;

@@ -7,6 +7,8 @@ public class Party : IEnumerable<ICharacter>
     public List<ICharacter> HeroesParty { get; set; }
     public List<ICharacter> MonstersParty { get; set; }  
     public GameEngine TurnList { get; set; }
+    public GameEngine GameEngineForAddShield { get; set; }
+    public AttackModifier AttackModifierForAI { get; set; } // Initialized in GameEngine - InizializeSecondBattle()
 
 
     public Party()
@@ -48,11 +50,11 @@ public class Party : IEnumerable<ICharacter>
         Random random = new Random();
         Console.WriteLine($"It's {monster.Name}'s turn. Their health points are {monster.HP}");
         Thread.Sleep(1000);
-        if (monster.HP < 2 && monster.PotionsAvailable > 0)
+        if (monster.HP < monster.MaxHP && monster.PotionsAvailable > 0)
         {
             HealthPotion healthPotion = new HealthPotion(1);
             Console.WriteLine($"{monster.Name} has taken a potion to restore its health.");
-            monster.HP = healthPotion.Hit(monster);
+            monster.HP = healthPotion.Hit(monster, monster); // POTENTIAL ERROR
             Console.WriteLine($"Its new HP is {monster.HP}");
             Thread.Sleep(2000);
         }
@@ -65,6 +67,7 @@ public class Party : IEnumerable<ICharacter>
                                             orderby o.HP
                                             select o).ToList();
             ICharacter randomTarget = weakestList[random.Next(weakestList.Count)];
+            randomTarget.HitsTakenPerBattle++;
             //ICharacter randomTarget = weakestList[0];
             List<AttackType> availableAttacks = (from o in monster.AttackT
                                                  select o).ToList();
@@ -85,14 +88,43 @@ public class Party : IEnumerable<ICharacter>
             IAction strongestAction = strongestActionList[0];
             Console.WriteLine($"{monster.Name} is attacking {randomTarget.Name} with a {strongestAction.Name}!");
             Thread.Sleep(2000);
-            randomTarget.HP = strongestAction.Hit(randomTarget);
-
-            Console.WriteLine($"{randomTarget.Name}'s HP is now {randomTarget.HP}");
+            randomTarget.HP = strongestAction.Hit(randomTarget, monster);
+            if (randomTarget.AttackModifier != null && randomTarget.HitsTakenPerBattle <= AttackModifierForAI.HitsBeforeBreaking)
+            {
+                AttackModifierForAI.AttackMod(monster, randomTarget);
+            }
+            if (randomTarget.AttackModifier != null && randomTarget.HitsTakenPerBattle == AttackModifierForAI.HitsBeforeBreaking+1)
+            {
+              
+                Console.WriteLine($"{randomTarget.Name}'s shield is broken.");
+                Console.WriteLine($"{randomTarget.Name}'s HP is now {randomTarget.HP}");
+            }
+            else
+                Console.WriteLine($"{randomTarget.Name}'s HP is now {randomTarget.HP}");
+            
             if (randomTarget.HP < 1)
             {
                 randomTarget.IsDead = true;
                 Console.WriteLine($"{randomTarget.Name} has been killed.");
             }
         }   
+    }
+
+    public void AddShield(int battleNumber)
+    {
+        foreach (ICharacter character in HeroesParty)
+        {
+            if (!character.IsDead && battleNumber == 2)
+            {
+                AttackModifier silverShield = new AttackModifier(AttackModifierEnum.SilverShield, 2, 2);
+                
+                character.AttackModifier = silverShield;
+            }
+            if (!character.IsDead && battleNumber == 3)
+            {
+                AttackModifier goldenShield = new AttackModifier(AttackModifierEnum.GoldenShield, 3, 2);
+                character.AttackModifier = goldenShield;
+            }
+        }
     }
 }

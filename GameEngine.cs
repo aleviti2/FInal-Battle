@@ -15,6 +15,7 @@ public class GameEngine
     public MistyFist MistyFist { get; set; }
     public HealthPotion HealthPotion { get; set; }
     public bool IsAIActive { get; set; }
+    public AttackModifier AttackModifierProperty { get; set; }
     public event Action? BattleEnded;
 
 
@@ -40,7 +41,8 @@ public class GameEngine
 
         Party = previousBattle.Party;
         TurnList = new List<ICharacter>();
-
+        //BattleSeries.PartyForAttackModifier = Party;
+        Party.GameEngineForAddShield = previousBattle;
         Punch = previousBattle.Punch;
         BoneCrunch = previousBattle.BoneCrunch;
         Claw = previousBattle.Claw;
@@ -64,12 +66,16 @@ public class GameEngine
     public void InizializeSecondBattle(GameEngine firstGame)
     {
         this.BattleSeries = firstGame.BattleSeries;
+        Party.AttackModifierForAI = BattleSeries.AttackModifier;     
         BattleEnded += BattleSeries.OnBattleManager;
+        Console.WriteLine($"Welcome to battle N.{BattleSeries.CurrentBattleNumber}. The Heroes have gained a {AttackModifierProperty.Name} that will protect them. Take good care of it!");
     }
     public void InizializeFinalBattle(GameEngine secondGame)
     {
         this.BattleSeries = secondGame.BattleSeries;
+        Party.AttackModifierForAI = BattleSeries.AttackModifier;
         BattleEnded += BattleSeries.OnBattleManager;
+        Console.WriteLine($"Welcome to battle N.{BattleSeries.CurrentBattleNumber}. The Heroes have gained a {AttackModifierProperty.Name} that will protect them. Take good care of it!");
     }
 
     public int SetHeroesNumber()
@@ -201,7 +207,7 @@ public class GameEngine
                             case "drink potion":
                                 {
                                     int hpNow = character.HP;
-                                    character.HP = HealthPotion.Hit(character);
+                                    character.HP = HealthPotion.Hit(character,character); //POTENTIAL ISSUE
                                     if (hpNow == character.HP)
                                         potionTaken = false;
                                     Console.WriteLine($"{character.Name}'s new HP is {character.HP}");
@@ -232,6 +238,10 @@ public class GameEngine
         }
         else if (Party.MonstersParty.Any(monster => !monster.IsDead) && Party.HeroesParty.All(hero => hero.IsDead))
             Console.WriteLine("The Monsters have prevailed!");
+        foreach (ICharacter hero in Party.HeroesParty)
+        {
+            hero.HitsTakenPerBattle= 0;
+        }
     }
     public void InvokeOrEnd()
     {
@@ -261,7 +271,7 @@ public class GameEngine
         Console.WriteLine("Type the Name of the character you want to attack, then press Enter");
         string inputCharacterAttacked = Console.ReadLine();
         ICharacter targetCharacter = targets.FirstOrDefault(target => target.Name == inputCharacterAttacked); //LINQ method that returns the first element in a sequence that satisfies a specified condition.FirstOrDefault iterates through the elements in the collection.
-                                                                                                              //if (targetMonster == null) continue;
+        targetCharacter.HitsTakenPerBattle++;                                                                                                    //if (targetMonster == null) continue;
         Console.WriteLine($"{targetCharacter.Name}");
         Console.WriteLine($"What kind of Attack would you like to perform? You have:");                                                                                                                                                  //For each element, it applies the condition specified in the lambda expression.
         foreach (AttackType attack in attacker.AttackT)
@@ -274,22 +284,37 @@ public class GameEngine
         switch (attackSelected)
         {
             case AttackType.Punch:
-                targetCharacter.HP = Punch.Hit(targetCharacter);
+                targetCharacter.HP = Punch.Hit(targetCharacter, attacker);
                 break;
             case AttackType.BoneCrunch:
-                targetCharacter.HP = BoneCrunch.Hit(targetCharacter);
+                targetCharacter.HP = BoneCrunch.Hit(targetCharacter, attacker);
                 break;
             case AttackType.MistyFist:
-                targetCharacter.HP = MistyFist.Hit(targetCharacter);
+                targetCharacter.HP = MistyFist.Hit(targetCharacter, attacker);
                 break;
             case AttackType.Claw:
-                targetCharacter.HP = Claw.Hit(targetCharacter);
+                targetCharacter.HP = Claw.Hit(targetCharacter, attacker);
                 break;
             default:
                 Console.WriteLine("Invalid attack type");
                 break;
         }
-        Console.WriteLine($"Your opponent's HP is now {targetCharacter.HP}");
+        if (targetCharacter.AttackModifier != null && targetCharacter.HitsTakenPerBattle <= AttackModifierProperty.HitsBeforeBreaking)
+        {
+            AttackModifierProperty.AttackMod(attacker, targetCharacter);
+        }
+        if (targetCharacter.AttackModifier != null && (targetCharacter.HitsTakenPerBattle == AttackModifierProperty.HitsBeforeBreaking+1))
+        {
+            Console.WriteLine($"{targetCharacter.Name}'s shield is broken.");
+            Console.WriteLine($"{targetCharacter.Name}'s HP is now {targetCharacter.HP}");
+        }
+        else
+        {
+ 
+            Console.WriteLine($"{targetCharacter.Name}'s HP is now {targetCharacter.HP}");
+        }
+        
+        
         targetCharacter.IsDead = AreYouDead(targetCharacter, TurnList);
 
     }

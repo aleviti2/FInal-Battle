@@ -2,7 +2,7 @@
 
 Party party = new Party();
 
-GameEngine gameEngine = new GameEngine(party, new List<ICharacter> { new Skeleton(4,4, 1, "Gomer"), new Skeleton(4,4, 1, "Nefasto")});
+GameEngine gameEngine = new GameEngine(party, new List<ICharacter> { new Skeleton(1,1, 1, "Gomer"), new Skeleton(1,1, 1, "Nefasto")});
 
 
 gameEngine.SetHeroesNumber();
@@ -27,3 +27,4 @@ gameEngine.InvokeOrEnd();
 public enum AttackType { Punch, BoneCrunch, Claw, MistyFist }
 public enum CharacterType { VinFletcher, Tog }
 public enum Category { Hero, Skeleton, Werewolf, TheUncodedOne }
+public enum AttackModifierEnum { GoldenShield, SilverShield}
