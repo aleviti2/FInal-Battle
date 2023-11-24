@@ -24,7 +24,7 @@ gameEngine.CreateTurnList();
 
 gameEngine.TurnsManager();
 gameEngine.InvokeOrEnd();
-public enum AttackType { Punch, BoneCrunch, Claw, MistyFist }
+public enum AttackType { Punch, BoneCrunch, Claw, MistyFist, ThunderBlast, Annihilator }
 public enum CharacterType { VinFletcher, Tog }
 public enum Category { Hero, Skeleton, Werewolf, TheUncodedOne }
-public enum AttackModifierEnum { GoldenShield, SilverShield}
+public enum AttackModifierEnum { GoldenShield, SilverShield, NoShield}

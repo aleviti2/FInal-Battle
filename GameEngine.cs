@@ -14,6 +14,8 @@ public class GameEngine
     public Claw Claw { get; set; }
     public MistyFist MistyFist { get; set; }
     public HealthPotion HealthPotion { get; set; }
+    public ThunderBlast ThunderBlast { get; set; }
+    public Annihilator Annihilator { get; set; }
     public bool IsAIActive { get; set; }
     public AttackModifier AttackModifierProperty { get; set; }
     public event Action? BattleEnded;
@@ -23,13 +25,15 @@ public class GameEngine
     {
         Party = party;
         TurnList = new List<ICharacter>();
-
+        AttackModifierProperty = new AttackModifier(AttackModifierEnum.NoShield,0,0);
+        Party.AttackModifierForAI=AttackModifierProperty;
         Punch = new Punch();
         BoneCrunch = new BoneCrunch();
         Claw = new Claw();
         MistyFist = new MistyFist();
         HealthPotion = new HealthPotion(1);
-
+        ThunderBlast = new ThunderBlast(3);
+        Annihilator = new Annihilator(4,4);
         foreach (ICharacter character in monsters)
         {
             Party.AddCharacter(character);
@@ -48,6 +52,8 @@ public class GameEngine
         Claw = previousBattle.Claw;
         MistyFist = previousBattle.MistyFist;
         HealthPotion= previousBattle.HealthPotion;
+        ThunderBlast= previousBattle.ThunderBlast;
+        Annihilator= previousBattle.Annihilator;
         List<ICharacter> survivingCharacters = previousBattle.Party.HeroesParty.Where(hero => !hero.IsDead).ToList();
         AliveHeroes = survivingCharacters;
         Party.MonstersParty = new List<ICharacter>();
@@ -99,11 +105,11 @@ public class GameEngine
                 Hero hero;
                 if (i == 0)
                 {
-                    hero = new Hero(4, 4, 1, "Hero1", CharacterType.VinFletcher);
+                    hero = new Hero(50, 50, 1, "Hero1", CharacterType.VinFletcher);
                 }
                 else
                 {
-                    hero = new Hero(4, 4, 1, "Hero2", CharacterType.Tog);
+                    hero = new Hero(50, 50, 1, "Hero2", CharacterType.Tog);
                 }
                 hero.GiveName();
                 Party.AddCharacter(hero);
@@ -111,7 +117,7 @@ public class GameEngine
         }
         else if (HeroesNumber == 1)
         {
-            Hero hero = new Hero(4, 4, 1, "Hero1", CharacterType.VinFletcher);
+            Hero hero = new Hero(50, 50, 1, "Hero1", CharacterType.VinFletcher);
             hero.GiveName();
             Party.AddCharacter(hero);
         }
@@ -138,6 +144,8 @@ public class GameEngine
 
     public List<ICharacter> CreateTurnList()
     {
+        AttackModifierProperty.BuyActions(BattleSeries, AliveHeroes, this);
+
         List<ICharacter> availableHeroes;
         //TurnList.Clear();
         if (AliveHeroes == null)
@@ -272,7 +280,7 @@ public class GameEngine
         string inputCharacterAttacked = Console.ReadLine();
         ICharacter targetCharacter = targets.FirstOrDefault(target => target.Name == inputCharacterAttacked); //LINQ method that returns the first element in a sequence that satisfies a specified condition.FirstOrDefault iterates through the elements in the collection.
         targetCharacter.HitsTakenPerBattle++;                                                                                                    //if (targetMonster == null) continue;
-        Console.WriteLine($"{targetCharacter.Name}");
+        //Console.WriteLine($"{targetCharacter.Name}");
         Console.WriteLine($"What kind of Attack would you like to perform? You have:");                                                                                                                                                  //For each element, it applies the condition specified in the lambda expression.
         foreach (AttackType attack in attacker.AttackT)
         {
@@ -295,27 +303,35 @@ public class GameEngine
             case AttackType.Claw:
                 targetCharacter.HP = Claw.Hit(targetCharacter, attacker);
                 break;
+            case AttackType.ThunderBlast:
+                targetCharacter.HP = ThunderBlast.Hit(targetCharacter,attacker);
+                break;
+            case AttackType.Annihilator:
+                targetCharacter.HP = Annihilator.Hit(targetCharacter, attacker);
+                break;
             default:
                 Console.WriteLine("Invalid attack type");
                 break;
         }
-        if (targetCharacter.AttackModifier != null && targetCharacter.HitsTakenPerBattle <= AttackModifierProperty.HitsBeforeBreaking)
-        {
-            AttackModifierProperty.AttackMod(attacker, targetCharacter);
-        }
-        if (targetCharacter.AttackModifier != null && (targetCharacter.HitsTakenPerBattle == AttackModifierProperty.HitsBeforeBreaking+1))
-        {
-            Console.WriteLine($"{targetCharacter.Name}'s shield is broken.");
-            Console.WriteLine($"{targetCharacter.Name}'s HP is now {targetCharacter.HP}");
-        }
-        else
-        {
+        AttackModifierProperty.CheckForAttackModifier(attacker, targetCharacter);
+        //if (targetCharacter.AttackModifier != null && targetCharacter.HitsTakenPerBattle <= AttackModifierProperty.HitsBeforeBreaking)
+        //{
+        //    AttackModifierProperty.AttackMod(attacker, targetCharacter);
+        //}
+        //if (targetCharacter.AttackModifier != null && (targetCharacter.HitsTakenPerBattle == AttackModifierProperty.HitsBeforeBreaking+1))
+        //{
+        //    Console.WriteLine($"{targetCharacter.Name}'s shield is broken.");
+        //    Console.WriteLine($"{targetCharacter.Name}'s HP is now {targetCharacter.HP}");
+        //}
+        //else
+        //{
  
-            Console.WriteLine($"{targetCharacter.Name}'s HP is now {targetCharacter.HP}");
-        }
+        //    Console.WriteLine($"{targetCharacter.Name}'s HP is now {targetCharacter.HP}");
+        //}
         
         
         targetCharacter.IsDead = AreYouDead(targetCharacter, TurnList);
+        attacker.IsDead = AreYouDead(attacker, TurnList);
 
     }
 
@@ -324,7 +340,7 @@ public class GameEngine
         if (cAttacked.HP <= 0)
         {
             cAttacked.IsDead = true;
-            Console.WriteLine($"Your opponent {cAttacked.Name} has been killed.");
+            Console.WriteLine($"{cAttacked.Name} has been killed.");
 
             ICharacter turnListHero = Party.HeroesParty.FirstOrDefault(character => character.Name == cAttacked.Name);
 

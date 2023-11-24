@@ -6,7 +6,7 @@ public class Party : IEnumerable<ICharacter>
     public List<ICharacter> AllCharactersList { get; set; }
     public List<ICharacter> HeroesParty { get; set; }
     public List<ICharacter> MonstersParty { get; set; }  
-    public GameEngine TurnList { get; set; }
+    //public GameEngine TurnList { get; set; }
     public GameEngine GameEngineForAddShield { get; set; }
     public AttackModifier AttackModifierForAI { get; set; } // Initialized in GameEngine - InizializeSecondBattle()
 
@@ -89,18 +89,19 @@ public class Party : IEnumerable<ICharacter>
             Console.WriteLine($"{monster.Name} is attacking {randomTarget.Name} with a {strongestAction.Name}!");
             Thread.Sleep(2000);
             randomTarget.HP = strongestAction.Hit(randomTarget, monster);
-            if (randomTarget.AttackModifier != null && randomTarget.HitsTakenPerBattle <= AttackModifierForAI.HitsBeforeBreaking)
-            {
-                AttackModifierForAI.AttackMod(monster, randomTarget);
-            }
-            if (randomTarget.AttackModifier != null && randomTarget.HitsTakenPerBattle == AttackModifierForAI.HitsBeforeBreaking+1)
-            {
+            AttackModifierForAI.CheckForAttackModifier(monster, randomTarget);
+            //if (randomTarget.AttackModifier != null && randomTarget.HitsTakenPerBattle <= AttackModifierForAI.HitsBeforeBreaking)
+            //{
+            //    AttackModifierForAI.AttackMod(monster, randomTarget);
+            //}
+            //if (randomTarget.AttackModifier != null && randomTarget.HitsTakenPerBattle == AttackModifierForAI.HitsBeforeBreaking+1)
+            //{
               
-                Console.WriteLine($"{randomTarget.Name}'s shield is broken.");
-                Console.WriteLine($"{randomTarget.Name}'s HP is now {randomTarget.HP}");
-            }
-            else
-                Console.WriteLine($"{randomTarget.Name}'s HP is now {randomTarget.HP}");
+            //    Console.WriteLine($"{randomTarget.Name}'s shield is broken.");
+            //    Console.WriteLine($"{randomTarget.Name}'s HP is now {randomTarget.HP}");
+            //}
+            //else
+            //    Console.WriteLine($"{randomTarget.Name}'s HP is now {randomTarget.HP}");
             
             if (randomTarget.HP < 1)
             {

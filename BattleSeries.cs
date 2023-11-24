@@ -6,15 +6,14 @@ public class BattleSeries
     public GameEngine ThirdBattle { get; set; }
     //public GameEngine NewBattle { get; set; }
     public int CurrentBattleNumber { get; set; } = 1;
-    (string, int, int) ScoresByPlayer { get; set; }
-    public TheUncodedOne UncodedOne { get; set; }
-    public Party ForAttackModifier { get; set; }
+    //(string, int, int) ScoresByPlayer { get; set; }
+    //public TheUncodedOne UncodedOne { get; set; }
+     public Party ForAttackModifier { get; set; }
    
     public AttackModifier AttackModifier { get; set; }
     public BattleSeries(GameEngine engine)
     {
-        GameEngineProperty = engine;
-        
+        GameEngineProperty = engine;       
     }
 
     public void OnBattleManager() => ResetToNewBattle();
@@ -23,7 +22,7 @@ public class BattleSeries
     {
         if (CurrentBattleNumber == 2)
         { 
-            SecondBattle = new GameEngine(GameEngineProperty ,new List<ICharacter> { new Werewolf(3,3,1,"Romulus"), new Werewolf(3,3,1,"Remus")});
+            SecondBattle = new GameEngine(GameEngineProperty ,new List<ICharacter> { new Werewolf(10,10,1,"Romulus"), new Werewolf(30,30,1,"Remus")});
             AttackModifier silverShield = new AttackModifier(AttackModifierEnum.SilverShield, 2, 2 );
             SecondBattle.AttackModifierProperty = silverShield;
             AttackModifier = silverShield;
@@ -39,7 +38,7 @@ public class BattleSeries
         }
         else if (CurrentBattleNumber == 3) 
         {
-            ThirdBattle = new GameEngine(SecondBattle, new List<ICharacter> { new TheUncodedOne(2,2,0)});
+            ThirdBattle = new GameEngine(SecondBattle, new List<ICharacter> { new TheUncodedOne(30,30,0)});
             AttackModifier goldenShield = new AttackModifier(AttackModifierEnum.GoldenShield, 3, 2);
             ThirdBattle.AttackModifierProperty = goldenShield;
             AttackModifier = goldenShield;
