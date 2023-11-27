@@ -171,10 +171,9 @@ public class GameEngine
         bool exitBothLoops = false;
         while (true)
         {
-            //Console.WriteLine($"The turnListCOPY contains {TurnList.Count}");
-
-
-            //Console.WriteLine($"The HeroesParty list contains {Party.HeroesParty.Count}. The MonsterParty list contains {Party.MonstersParty.Count}");
+            if (Party.HeroesParty.All(hero => hero.IsDead) && Party.MonstersParty.All(monster => monster.IsDead))
+                break;
+            
             foreach (ICharacter character in TurnList.Where(ch => !ch.IsDead))
             {
                 if (Party.HeroesParty.All(hero => hero.IsDead) || Party.MonstersParty.All(monster => monster.IsDead))
@@ -191,6 +190,7 @@ public class GameEngine
                     bool potionTaken = false;
                     while (!potionTaken)
                     {
+                        GameStatus(this.BattleSeries, this.Party, this.AttackModifierProperty);
                         potionTaken = true;
                         Console.WriteLine($"It's {character.Name}'s turn. Their health points are {character.HP}. Do you want to 'do nothing', 'attack' or 'drink potion?'");
                         string input = Console.ReadLine();
@@ -246,6 +246,8 @@ public class GameEngine
         }
         else if (Party.MonstersParty.Any(monster => !monster.IsDead) && Party.HeroesParty.All(hero => hero.IsDead))
             Console.WriteLine("The Monsters have prevailed!");
+        else if (Party.HeroesParty.All(hero => hero.IsDead) && Party.MonstersParty.All(monster => monster.IsDead))
+            Console.WriteLine("The Heroes killed all the Monsters but died in battle.");
         foreach (ICharacter hero in Party.HeroesParty)
         {
             hero.HitsTakenPerBattle= 0;
@@ -359,4 +361,34 @@ public class GameEngine
         return false;
     }
 
+    public void GameStatus ( BattleSeries battleSeries, Party party, AttackModifier attackModifier)
+    {
+        //List<ICharacter> aliveHeroes = new List<ICharacter>();
+        
+        Console.WriteLine($"==================== BATTLE N {battleSeries.CurrentBattleNumber} ==================== ");
+        Console.WriteLine();
+        foreach (ICharacter hero in Party.HeroesParty )
+        {
+            if (!hero.IsDead)
+            {     //aliveHeroes.Add(hero);
+                Console.WriteLine($"{hero.Name}. HP: {hero.HP}/{hero.MaxHP}. Health Potions Available: {hero.PotionsAvailable}. ");
+                if (hero.AttackModifier != null && hero.AttackModifier.Name != AttackModifierEnum.NoShield && hero.HitsTakenPerBattle <= attackModifier.HitsBeforeBreaking)
+                {
+                    int currentHit = attackModifier.HitsBeforeBreaking - hero.HitsTakenPerBattle;
+                    Console.WriteLine($"Shield equipped: {hero.AttackModifier.Name}. The shield will protect {hero.Name} for another {currentHit}/{attackModifier.HitsBeforeBreaking} attacks.");
+                }
+            }
+        }
+        foreach (ICharacter monster in Party.MonstersParty)
+        {
+            if (!monster.IsDead)
+            {     //aliveHeroes.Add(hero);
+                Console.WriteLine($"{monster.Name}. HP: {monster.HP}/{monster.MaxHP}. Health Potions Available: {monster.PotionsAvailable}. ");
+            }
+        }
+        Console.WriteLine();
+        Console.WriteLine("====================================================");
+        
+    }
 }
+

@@ -85,7 +85,8 @@ public class AttackModifier
             }
             else if (input != null && input == "No")
             {
-                Console.WriteLine("You have decided to refuse.");
+               
+                    Console.WriteLine("You have decided to refuse.");
             }
         }
     }
