@@ -22,8 +22,8 @@ public class BattleSeries
     {
         if (CurrentBattleNumber == 2)
         { 
-            SecondBattle = new GameEngine(GameEngineProperty ,new List<ICharacter> { new Werewolf(10,10,1,"Romulus"), new Werewolf(30,30,1,"Remus")});
-            AttackModifier silverShield = new AttackModifier(AttackModifierEnum.SilverShield, 2, 2 );
+            SecondBattle = new GameEngine(GameEngineProperty ,new List<ICharacter> { new Werewolf(30,30,1,"Romulus"), new Werewolf(30,30,1,"Remus")});
+            AttackModifier silverShield = new AttackModifier(AttackModifierEnum.SilverShield, 4, 2 );
             SecondBattle.AttackModifierProperty = silverShield;
             AttackModifier = silverShield;
             SecondBattle.InizializeSecondBattle(GameEngineProperty);
@@ -38,8 +38,8 @@ public class BattleSeries
         }
         else if (CurrentBattleNumber == 3) 
         {
-            ThirdBattle = new GameEngine(SecondBattle, new List<ICharacter> { new TheUncodedOne(30,30,0)});
-            AttackModifier goldenShield = new AttackModifier(AttackModifierEnum.GoldenShield, 3, 2);
+            ThirdBattle = new GameEngine(SecondBattle, new List<ICharacter> { new TheUncodedOne(40,40,2)});
+            AttackModifier goldenShield = new AttackModifier(AttackModifierEnum.GoldenShield, 5, 3);
             ThirdBattle.AttackModifierProperty = goldenShield;
             AttackModifier = goldenShield;
             ThirdBattle.InizializeFinalBattle(SecondBattle);

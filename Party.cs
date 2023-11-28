@@ -50,9 +50,9 @@ public class Party : IEnumerable<ICharacter>
         Random random = new Random();
         Console.WriteLine($"It's {monster.Name}'s turn. Their health points are {monster.HP}");
         Thread.Sleep(1000);
-        if (monster.HP < monster.MaxHP && monster.PotionsAvailable > 0)
+        if (monster.HP < monster.MaxHP/2 && monster.PotionsAvailable > 0)
         {
-            HealthPotion healthPotion = new HealthPotion(1);
+            HealthPotion healthPotion = new HealthPotion(10);
             Console.WriteLine($"{monster.Name} has taken a potion to restore its health.");
             monster.HP = healthPotion.Hit(monster, monster); // POTENTIAL ERROR
             Console.WriteLine($"Its new HP is {monster.HP}");

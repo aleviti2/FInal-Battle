@@ -40,7 +40,7 @@ public class Hero : Character
 {
 
     public CharacterType CharacterType { get; set; }
-    public Hero(int hp, int maxHP, int battlesWon, string name, CharacterType cType) : base(hp, maxHP, battlesWon, name, Category.Hero)
+    public Hero(int hp, int maxHP, int potionsAvailable, string name, CharacterType cType) : base(hp, maxHP, potionsAvailable, name, Category.Hero)
     {
         AttackT = new List<AttackType>
         {

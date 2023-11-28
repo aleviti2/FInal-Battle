@@ -1,4 +1,5 @@
-﻿using System.Linq.Expressions;
+﻿using System.Linq;
+using System.Linq.Expressions;
 using System.Reflection.Metadata.Ecma335;
 using System.Security.Cryptography.X509Certificates;
 using System.Xml.Linq;
@@ -31,9 +32,9 @@ public class GameEngine
         BoneCrunch = new BoneCrunch();
         Claw = new Claw();
         MistyFist = new MistyFist();
-        HealthPotion = new HealthPotion(1);
-        ThunderBlast = new ThunderBlast(3);
-        Annihilator = new Annihilator(4,4);
+        HealthPotion = new HealthPotion(10);
+        ThunderBlast = new ThunderBlast(4);
+        Annihilator = new Annihilator(4,8);
         foreach (ICharacter character in monsters)
         {
             Party.AddCharacter(character);
@@ -74,24 +75,54 @@ public class GameEngine
         this.BattleSeries = firstGame.BattleSeries;
         Party.AttackModifierForAI = BattleSeries.AttackModifier;     
         BattleEnded += BattleSeries.OnBattleManager;
-        Console.WriteLine($"Welcome to battle N.{BattleSeries.CurrentBattleNumber}. The Heroes have gained a {AttackModifierProperty.Name} that will protect them. Take good care of it!");
+        Console.ForegroundColor = ConsoleColor.DarkCyan;
+        Console.WriteLine("");
+        Console.WriteLine("====================================================");
+        Console.WriteLine($"WELCOME TO BATTLE N.{BattleSeries.CurrentBattleNumber}. The Heroes have gained a {AttackModifierProperty.Name} that will protect them. Take good care of it!");
+        Console.ResetColor();
     }
     public void InizializeFinalBattle(GameEngine secondGame)
     {
         this.BattleSeries = secondGame.BattleSeries;
         Party.AttackModifierForAI = BattleSeries.AttackModifier;
         BattleEnded += BattleSeries.OnBattleManager;
-        Console.WriteLine($"Welcome to battle N.{BattleSeries.CurrentBattleNumber}. The Heroes have gained a {AttackModifierProperty.Name} that will protect them. Take good care of it!");
+        Console.ForegroundColor = ConsoleColor.DarkCyan;
+        Console.WriteLine("");
+        Console.WriteLine("====================================================");
+        Console.WriteLine($"WELCOME TO BATTLE N.{BattleSeries.CurrentBattleNumber}. The Heroes have gained a {AttackModifierProperty.Name} that will protect them. Take good care of it!");
+        Console.ResetColor();
     }
 
     public int SetHeroesNumber()
     {
-        Console.WriteLine("Welcome to the dungeon valiant heroes. Enter the number of players");
-        HeroesNumber = Convert.ToInt32(Console.ReadLine());
-        Console.WriteLine("Do you want the monsters to be controlled by an AI?");
-        string input = Console.ReadLine();
-        if (input != null && input == "Yes")
-            IsAIActive = true;
+        Console.WriteLine("Welcome to the dungeon valiant heroes. You will have to fight against skeletons, werewolves and the mighty Mephisto, the 'Uncoded One', master of the dungeon. Enter the number of players (you can control 1 or 2 heroes)");
+        do
+        {
+            int nPlayersOutput;
+            
+            if (int.TryParse(Console.ReadLine(), out nPlayersOutput) && (nPlayersOutput == 1 || nPlayersOutput == 2))
+            { HeroesNumber = nPlayersOutput;
+                break;
+            }
+                
+            else Console.WriteLine("Enter 1 or 2");
+        } while (true);
+        //HeroesNumber = Convert.ToInt32(Console.ReadLine());
+        Console.WriteLine("If you're playing solo, you may opt to have the game control the monsters. Do you want the monsters to be controlled by an AI?");
+        bool isValidInput = false;
+        do
+        {
+            string input = Console.ReadLine();
+            if (input != null && (input.ToLower() == "yes" || input.ToLower() == "no"))
+            {
+                IsAIActive = input.ToLower() == "yes";
+                isValidInput = true;
+            }
+            else
+            {
+                Console.WriteLine("Invalid input. Please enter 'Yes' or 'No'.");
+            }
+        } while (!isValidInput);  
         return HeroesNumber;
     }
     public void ChooseHeroes()
@@ -105,11 +136,11 @@ public class GameEngine
                 Hero hero;
                 if (i == 0)
                 {
-                    hero = new Hero(50, 50, 1, "Hero1", CharacterType.VinFletcher);
+                    hero = new Hero(70, 70, 3, "Hero1", CharacterType.VinFletcher);
                 }
                 else
                 {
-                    hero = new Hero(50, 50, 1, "Hero2", CharacterType.Tog);
+                    hero = new Hero(70, 70, 3, "Hero2", CharacterType.Tog);
                 }
                 hero.GiveName();
                 Party.AddCharacter(hero);
@@ -117,7 +148,7 @@ public class GameEngine
         }
         else if (HeroesNumber == 1)
         {
-            Hero hero = new Hero(50, 50, 1, "Hero1", CharacterType.VinFletcher);
+            Hero hero = new Hero(100, 100, 3, "Hero1", CharacterType.VinFletcher);
             hero.GiveName();
             Party.AddCharacter(hero);
         }
@@ -192,36 +223,46 @@ public class GameEngine
                     {
                         GameStatus(this.BattleSeries, this.Party, this.AttackModifierProperty);
                         potionTaken = true;
-                        Console.WriteLine($"It's {character.Name}'s turn. Their health points are {character.HP}. Do you want to 'do nothing', 'attack' or 'drink potion?'");
-                        string input = Console.ReadLine();
-                        switch (input.ToLower())
+                        bool isValidInput = false;
+                        do
                         {
-                            case "do nothing":
-                                Console.WriteLine("You've decided to wait.");
-                                continue;
-                            case "attack":
+                            Console.WriteLine($"It's {character.Name}'s turn. Their health points are {character.HP}. Do you want to 'do nothing', 'attack' or 'drink potion?'");
+                            string input = Console.ReadLine();
+                            switch (input.ToLower())
+                            {
+                                case "do nothing":
+                                    Console.WriteLine("You've decided to wait.");
+                                    isValidInput = true;
+                                    break;
+                                //continue;
+                                case "attack":
 
-                                if (character.CharacterCategory == Category.Hero)
-                                {
-                                    Console.WriteLine("Attacking a monster");
-                                    AttackTarget(character, Party.MonstersParty);
-                                }
-                                else
-                                {
-                                    Console.WriteLine("Attacking a hero");
-                                    AttackTarget(character, Party.HeroesParty);
-                                }
-                                continue;
-                            case "drink potion":
-                                {
-                                    int hpNow = character.HP;
-                                    character.HP = HealthPotion.Hit(character,character); //POTENTIAL ISSUE
-                                    if (hpNow == character.HP)
-                                        potionTaken = false;
-                                    Console.WriteLine($"{character.Name}'s new HP is {character.HP}");
-                                }
-                                continue;
-                        }
+                                    if (character.CharacterCategory == Category.Hero)
+                                    {
+                                        Console.WriteLine("Attacking a monster");
+                                        AttackTarget(character, Party.MonstersParty);
+                                    }
+                                    else
+                                    {
+                                        Console.WriteLine("Attacking a hero");
+                                        AttackTarget(character, Party.HeroesParty);
+                                    }
+                                    isValidInput = true;
+                                    break;
+                                //continue;
+                                case "drink potion":
+                                    {
+                                        int hpNow = character.HP;
+                                        character.HP = HealthPotion.Hit(character, character); //POTENTIAL ISSUE
+                                        if (hpNow == character.HP)
+                                            potionTaken = false;
+                                        Console.WriteLine($"{character.Name}'s new HP is {character.HP}");
+                                    }
+                                    isValidInput = true;
+                                    break;
+                                    //continue;
+                            }
+                        } while (!isValidInput);
                     }
                 }
             }
@@ -236,18 +277,32 @@ public class GameEngine
             if (Party.HeroesParty.Count(hero => !hero.IsDead) == 2)
             {
                 var survivingHeroes = Party.HeroesParty.Where(hero => !hero.IsDead).ToList();
-                Console.WriteLine($"Congratulations! The Heroes prevailed. The winners are {survivingHeroes[0].Name} and {survivingHeroes[1].Name}.");
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.WriteLine($"***CONGRATULATIONS!*** THE HEROES PREVAILED! The winners are {survivingHeroes[0].Name} and {survivingHeroes[1].Name}.");
+                Console.ResetColor();
             }
             else if (Party.HeroesParty.Count(hero => !hero.IsDead) == 1 && Party.MonstersParty.All(monster => monster.IsDead))
             {
                 var survivingHeroes = Party.HeroesParty.Where(hero => !hero.IsDead).ToList();
-                Console.WriteLine($"Congratulations! The Heroes prevailed. The winner is {survivingHeroes[0].Name}.");
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.WriteLine($"***CONGRATULATIONS!*** THE HEROES PREVAILED! The winner is {survivingHeroes[0].Name}.");
+                Console.ResetColor();
             }
         }
         else if (Party.MonstersParty.Any(monster => !monster.IsDead) && Party.HeroesParty.All(hero => hero.IsDead))
-            Console.WriteLine("The Monsters have prevailed!");
+        {  
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            Console.WriteLine("THE MONSTERS HAVE PREVAILED!");
+            Console.ResetColor();
+        }
+            
         else if (Party.HeroesParty.All(hero => hero.IsDead) && Party.MonstersParty.All(monster => monster.IsDead))
-            Console.WriteLine("The Heroes killed all the Monsters but died in battle.");
+        {  
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            Console.WriteLine("THE HEROES KILLED ALL THE MONSTERS BUT DIED IN BATTLE.");
+            Console.ResetColor();
+        }
+            
         foreach (ICharacter hero in Party.HeroesParty)
         {
             hero.HitsTakenPerBattle= 0;
@@ -264,7 +319,7 @@ public class GameEngine
         }
         else
         {
-            Console.WriteLine("The game has concluded.");
+            Console.WriteLine("+++ GAME OVER +++");
         }
 
     }
@@ -276,45 +331,84 @@ public class GameEngine
         Console.WriteLine("You can attack: ");
         foreach (ICharacter target in targets.Where(target => !target.IsDead))
         {
+            Console.ForegroundColor = ConsoleColor.DarkMagenta;
             Console.WriteLine($"A {target.CharacterCategory} called {target.Name}");
+            Console.ResetColor();
         }
         Console.WriteLine("Type the Name of the character you want to attack, then press Enter");
-        string inputCharacterAttacked = Console.ReadLine();
-        ICharacter targetCharacter = targets.FirstOrDefault(target => target.Name == inputCharacterAttacked); //LINQ method that returns the first element in a sequence that satisfies a specified condition.FirstOrDefault iterates through the elements in the collection.
-        targetCharacter.HitsTakenPerBattle++;                                                                                                    //if (targetMonster == null) continue;
+        string inputCharacterAttacked;
+        ICharacter targetCharacter;
+        bool isValidInput = false;
+        do
+        {
+            inputCharacterAttacked = Console.ReadLine();
+            inputCharacterAttacked.ToLower();
+            targetCharacter = targets.FirstOrDefault(t => string.Equals(t.Name, inputCharacterAttacked, StringComparison.OrdinalIgnoreCase)); //Equals returns true/false. FirstOrDefault evaluates lambda expression, if true it returns an ICharacter.
+
+            //targetCharacter = targets.FirstOrDefault(target => target.Name == inputCharacterAttacked);
+            if (targetCharacter !=null)
+            { 
+                targetCharacter.HitsTakenPerBattle++;
+                isValidInput = true;
+            }
+            else
+            {
+                Console.WriteLine("Select a valid character.");
+            }
+        } while (!isValidInput);
+        
+         //LINQ method that returns the first element in a sequence that satisfies a specified condition.FirstOrDefault iterates through the elements in the collection.
+                                                                                                            //if (targetMonster == null) continue;
         //Console.WriteLine($"{targetCharacter.Name}");
         Console.WriteLine($"What kind of Attack would you like to perform? You have:");                                                                                                                                                  //For each element, it applies the condition specified in the lambda expression.
         foreach (AttackType attack in attacker.AttackT)
         {
+            Console.ForegroundColor= ConsoleColor.Green;
             Console.WriteLine($"{attack}");
+            Console.ResetColor();
         }
-        string inputAttack = Console.ReadLine();
-        AttackType attackSelected = attacker.AttackT.FirstOrDefault(attack => attack.ToString() == inputAttack);
-        //if (attackSelected == null) continue;
-        switch (attackSelected)
+        bool aSelected = false;
+        do
         {
-            case AttackType.Punch:
-                targetCharacter.HP = Punch.Hit(targetCharacter, attacker);
-                break;
-            case AttackType.BoneCrunch:
-                targetCharacter.HP = BoneCrunch.Hit(targetCharacter, attacker);
-                break;
-            case AttackType.MistyFist:
-                targetCharacter.HP = MistyFist.Hit(targetCharacter, attacker);
-                break;
-            case AttackType.Claw:
-                targetCharacter.HP = Claw.Hit(targetCharacter, attacker);
-                break;
-            case AttackType.ThunderBlast:
-                targetCharacter.HP = ThunderBlast.Hit(targetCharacter,attacker);
-                break;
-            case AttackType.Annihilator:
-                targetCharacter.HP = Annihilator.Hit(targetCharacter, attacker);
-                break;
-            default:
-                Console.WriteLine("Invalid attack type");
-                break;
-        }
+            string inputAttack = Console.ReadLine();
+            AttackType attackSelected;
+            
+            
+            if (Enum.TryParse(inputAttack, true, out attackSelected) && attacker.AttackT.Contains(attackSelected, EqualityComparer<AttackType>.Default)) // bool TryParse(string s, bool ignoreCase, out TEnum result);
+            {
+                aSelected = true;
+                //AttackType attackSelected = attacker.AttackT.FirstOrDefault(attack => attack.ToString() == inputAttack);
+                //if (attackSelected == null) continue;
+                switch (attackSelected)
+                {
+                    case AttackType.Punch:
+                        targetCharacter.HP = Punch.Hit(targetCharacter, attacker);
+                        break;
+                    case AttackType.BoneCrunch:
+                        targetCharacter.HP = BoneCrunch.Hit(targetCharacter, attacker);
+                        break;
+                    case AttackType.MistyFist:
+                        targetCharacter.HP = MistyFist.Hit(targetCharacter, attacker);
+                        break;
+                    case AttackType.Claw:
+                        targetCharacter.HP = Claw.Hit(targetCharacter, attacker);
+                        break;
+                    case AttackType.ThunderBlast:
+                        targetCharacter.HP = ThunderBlast.Hit(targetCharacter, attacker);
+                        break;
+                    case AttackType.Annihilator:
+                        targetCharacter.HP = Annihilator.Hit(targetCharacter, attacker);
+                        break;
+                    default:
+                        Console.WriteLine("Invalid attack type");
+                        break;
+                }
+            }
+            else
+            {
+                Console.WriteLine("Enter a valid attack.");
+            }
+        } while (!aSelected);
         AttackModifierProperty.CheckForAttackModifier(attacker, targetCharacter);
         //if (targetCharacter.AttackModifier != null && targetCharacter.HitsTakenPerBattle <= AttackModifierProperty.HitsBeforeBreaking)
         //{
@@ -342,8 +436,9 @@ public class GameEngine
         if (cAttacked.HP <= 0)
         {
             cAttacked.IsDead = true;
+            Console.ForegroundColor = ConsoleColor.Red;
             Console.WriteLine($"{cAttacked.Name} has been killed.");
-
+            Console.ResetColor();
             ICharacter turnListHero = Party.HeroesParty.FirstOrDefault(character => character.Name == cAttacked.Name);
 
             if (turnListHero != null)
@@ -363,8 +458,8 @@ public class GameEngine
 
     public void GameStatus ( BattleSeries battleSeries, Party party, AttackModifier attackModifier)
     {
-        //List<ICharacter> aliveHeroes = new List<ICharacter>();
-        
+        Console.ForegroundColor = ConsoleColor.Cyan;
+
         Console.WriteLine($"==================== BATTLE N {battleSeries.CurrentBattleNumber} ==================== ");
         Console.WriteLine();
         foreach (ICharacter hero in Party.HeroesParty )
@@ -388,7 +483,7 @@ public class GameEngine
         }
         Console.WriteLine();
         Console.WriteLine("====================================================");
-        
+        Console.ResetColor();
     }
 }
 

@@ -13,12 +13,14 @@ public interface IAction
 public class Punch : IAction
 {
     public string Name { get; } = "Punch";
-    public int HPInflicted { get; } = 2;
+    public int HPInflicted { get; } = 5;
     public int RequiredBattleNumber { get; set; }
     public int Hit(ICharacter characterHit, ICharacter attacker)
     {
         int newHP =characterHit.HP - HPInflicted;
+        Console.ForegroundColor = ConsoleColor.DarkRed;
         Console.WriteLine($"{attacker.Name} has landed a Punch, dealing {HPInflicted} points of damage to {characterHit}'s health.");
+        Console.ResetColor();
         return newHP;
     }
 
@@ -32,9 +34,11 @@ public class BoneCrunch : IAction
     public int Hit(ICharacter characterHit, ICharacter attacker)
     {
         Random random = new Random();
-        HPInflicted = random.Next(0, 2);
+        HPInflicted = random.Next(3, 11);
         int newHP = characterHit.HP - HPInflicted;
+        Console.ForegroundColor = ConsoleColor.DarkRed;
         Console.WriteLine($"{attacker.Name} has landed a Bone Crunch, dealing {HPInflicted} points of damage to {characterHit}'s health.");
+        Console.ResetColor();
         return newHP;
     }
 }
@@ -42,13 +46,22 @@ public class BoneCrunch : IAction
 public class Claw : IAction
 {
     public string Name { get; } = "Claw";
-    public int HPInflicted { get; } = 9;
+    public int HPInflicted { get; set; } 
     public int RequiredBattleNumber { get; set; }
     public int Hit(ICharacter characterHit, ICharacter attacker)
     {
+        Random random = new Random();
+        HPInflicted = random.Next(5, 15);
         int newHP = characterHit.HP - HPInflicted;
+        Console.ForegroundColor = ConsoleColor.DarkRed;
         Console.WriteLine($"{attacker.Name} has landed a Claw, dealing {HPInflicted} points of damage to {characterHit}'s health.");
+        Console.ResetColor();
         return newHP;
+        //int newHP = characterHit.HP - HPInflicted;
+        //Console.ForegroundColor = ConsoleColor.DarkRed;
+        //Console.WriteLine($"{attacker.Name} has landed a Claw, dealing {HPInflicted} points of damage to {characterHit}'s health.");
+        //Console.ResetColor();
+        //return newHP;
     }
 }
 
@@ -60,9 +73,11 @@ public class MistyFist : IAction
     public int Hit(ICharacter characterHit, ICharacter attacker)
     {
         Random random = new Random();
-        HPInflicted = random.Next(0, 10);
+        HPInflicted = random.Next(7, 18);
         int newHP = characterHit.HP - HPInflicted;
+        Console.ForegroundColor = ConsoleColor.DarkRed;
         Console.WriteLine($"{attacker.Name} has landed a Misty Fist, dealing {HPInflicted} points of damage to {characterHit.Name}'s health.");
+        Console.ResetColor();
         return newHP;
     }
 }
@@ -81,18 +96,24 @@ public class HealthPotion : IAction
         if ((potionOwner.PotionsAvailable > 0) && (potionOwner.HP < potionOwner.MaxHP))
         {
             int nwHP = potionOwner.HP + HPInflicted;
+            Console.ForegroundColor = ConsoleColor.DarkRed;
             Console.WriteLine($"The potion made {potionOwner.Name} regain {HPInflicted} health points!");
+            Console.ResetColor();
             potionOwner.PotionsAvailable--;
             return nwHP;
         }
         if ((potionOwner.PotionsAvailable > 0) && (potionOwner.HP == potionOwner.MaxHP))
         {
+            Console.ForegroundColor = ConsoleColor.DarkRed;
             Console.WriteLine("Your HP are already maxed out. No further increase is possible.");
+            Console.ResetColor();
             return potionOwner.HP;
         }
         else 
         {
+            Console.ForegroundColor = ConsoleColor.DarkRed;
             Console.WriteLine("You don't have any potion available");
+            Console.ResetColor();
             return potionOwner.HP; 
         }
     }
@@ -109,7 +130,7 @@ public interface IExtraActions
 public class ThunderBlast : IExtraActions
 {
     public string Name { get; } = "ThunderBlast";
-    public int HPInflicted { get; } = 7;            //Points inflicted to victim
+    public int HPInflicted { get; } = 9;            //Points inflicted to victim
     public int MAXHPSelfInflicted { get; set; }     //Points inflicted to attacker. Add 1 to the value when creating an instance of the object
     public int Cost { get; } = 2;
     public int RequiredBattleNumber { get; } = 2;
@@ -125,8 +146,10 @@ public class ThunderBlast : IExtraActions
         SelfInflicted = random.Next(0, MAXHPSelfInflicted);
         int newHP = characterHit.HP - HPInflicted;
         attacker.HP -= SelfInflicted;
+        Console.ForegroundColor = ConsoleColor.DarkRed;
         Console.WriteLine($"{attacker.Name} has landed a ThunderBlast, dealing {HPInflicted} points of damage to {characterHit.Name}'s health.");
         Console.WriteLine($"{attacker.Name} has suffered {SelfInflicted} HP. Their new HP is {attacker.HP}");
+        Console.ResetColor();
         return newHP;
     }
 }
@@ -134,7 +157,7 @@ public class ThunderBlast : IExtraActions
 public class Annihilator : IExtraActions
 {
     public string Name { get; } = "Annihilator";
-    public int HPInflicted { get; } = 10;
+    public int HPInflicted { get; } = 15;
     public int MAXHPSelfInflicted { get; set; }
     public int Cost { get; } = 3;
     public int RequiredBattleNumber { get; set; } = 3;
@@ -153,16 +176,20 @@ public class Annihilator : IExtraActions
         {
             characterHit.HP -= HPInflicted;
             attacker.HP = 0;
+            Console.ForegroundColor = ConsoleColor.DarkRed;
             Console.WriteLine($"{attacker.Name} has landed an Annihilator, dealing {HPInflicted} points of damage to {characterHit.Name}'s health.");
             Console.WriteLine($"{Name} was too powerful for {attacker.Name}.");
+            Console.ResetColor();
         }
         else
         {
             SelfInflicted = rand.Next(1, MAXHPSelfInflicted);
             attacker.HP -= SelfInflicted;
             characterHit.HP -= HPInflicted;
+            Console.ForegroundColor = ConsoleColor.DarkRed;
             Console.WriteLine($"{attacker.Name} has landed an Annihilator, dealing {HPInflicted} points of damage to {characterHit.Name}'s health.");
             Console.WriteLine($"{attacker.Name} has suffered {SelfInflicted} HP. Their new HP is {attacker.HP}");
+            Console.ResetColor();
         }
         return characterHit.HP;
     }

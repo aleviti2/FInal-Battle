@@ -63,31 +63,37 @@ public class AttackModifier
             if (extraAction.Name == "Annihilator")
                 Console.WriteLine($"This deadly power comes with an added steep price: by using it, you have 1 chance out of {extraAction.ChanceOfDying} of dying.");
             Console.WriteLine($"Also, this will come with a price. If you accept it, you will have to sacrifice {extraAction.Cost} HP. Will you take it? Yes/No.");
-           
-
-            string input = Console.ReadLine();
-
-            if (input != null && input == "Yes" && Enum.TryParse<AttackType>(extraAction.Name, out AttackType attackType))
+            bool exitLoop = false;
+            do
             {
-                foreach (ICharacter hero in heroes)
+                string input = Console.ReadLine();
+
+                if (input != null && string.Equals(input, "Yes", StringComparison.OrdinalIgnoreCase) && Enum.TryParse<AttackType>(extraAction.Name, true, out AttackType attackType))
                 {
-                    if (hero.HP > extraAction.Cost)
+                    foreach (ICharacter hero in heroes)
                     {
-                        hero.AttackT.Add(attackType);
-                        hero.HP -= extraAction.Cost;
-                        Console.WriteLine($"{hero.Name} acquired {extraAction.Name}.Their new HP is now {hero.HP}");
+                        if (hero.HP > extraAction.Cost)
+                        {
+                            hero.AttackT.Add(attackType);
+                            hero.HP -= extraAction.Cost;
+                            Console.WriteLine($"{hero.Name} acquired {extraAction.Name}.Their new HP is now {hero.HP}");
+                        }
+                        else /*if (hero.HP <= extraAction.Cost)*/
+                        {
+                            Console.WriteLine($"{hero.Name} doens't have enough HP to acquire the {extraAction.Name} power.");
+                        }
                     }
-                    else /*if (hero.HP <= extraAction.Cost)*/
-                    {
-                        Console.WriteLine($"{hero.Name} doens't have enough HP to acquire the {extraAction.Name} power.");
-                    }
-                }                                                   
-            }
-            else if (input != null && input == "No")
-            {
-               
+                    exitLoop = true;
+                }
+                else if (input != null && string.Equals(input, "No", StringComparison.OrdinalIgnoreCase))
+                {
+
                     Console.WriteLine("You have decided to refuse.");
-            }
+                    exitLoop = true;
+                }
+                else
+                    Console.WriteLine("Enter Yes or No.");
+            } while (!exitLoop);
         }
     }
 
