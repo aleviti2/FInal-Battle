@@ -95,7 +95,7 @@ public class GameEngine
 
     public int SetHeroesNumber()
     {
-        Console.WriteLine("Welcome to the dungeon valiant heroes. You will have to fight against skeletons, werewolves and the mighty Mephisto, the 'Uncoded One', master of the dungeon. Enter the number of players (you can control 1 or 2 heroes)");
+        Console.WriteLine("Welcome to the dungeon valiant heroes. You will have to fight against skeletons, werewolves and the mighty Mephisto, the 'Uncoded One', master of the dungeon. Enter the number of players (you can control 1 or 2 heroes. Input is case insensitive.)");
         do
         {
             int nPlayersOutput;
@@ -148,7 +148,7 @@ public class GameEngine
         }
         else if (HeroesNumber == 1)
         {
-            Hero hero = new Hero(100, 100, 3, "Hero1", CharacterType.VinFletcher);
+            Hero hero = new Hero(140, 140, 5, "Hero1", CharacterType.VinFletcher);
             hero.GiveName();
             Party.AddCharacter(hero);
         }
@@ -346,7 +346,7 @@ public class GameEngine
             targetCharacter = targets.FirstOrDefault(t => string.Equals(t.Name, inputCharacterAttacked, StringComparison.OrdinalIgnoreCase)); //Equals returns true/false. FirstOrDefault evaluates lambda expression, if true it returns an ICharacter.
 
             //targetCharacter = targets.FirstOrDefault(target => target.Name == inputCharacterAttacked);
-            if (targetCharacter !=null)
+            if (targetCharacter !=null && !targetCharacter.IsDead)
             { 
                 targetCharacter.HitsTakenPerBattle++;
                 isValidInput = true;

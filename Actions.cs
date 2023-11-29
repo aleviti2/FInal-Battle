@@ -93,7 +93,8 @@ public class HealthPotion : IAction
     }
     public int Hit(ICharacter potionOwner, ICharacter attacker)
     {
-        if ((potionOwner.PotionsAvailable > 0) && (potionOwner.HP < potionOwner.MaxHP))
+        int addHP = potionOwner.HP + HPInflicted;
+        if (addHP <= potionOwner.MaxHP && potionOwner.PotionsAvailable>0)
         {
             int nwHP = potionOwner.HP + HPInflicted;
             Console.ForegroundColor = ConsoleColor.DarkRed;
@@ -102,10 +103,13 @@ public class HealthPotion : IAction
             potionOwner.PotionsAvailable--;
             return nwHP;
         }
-        if ((potionOwner.PotionsAvailable > 0) && (potionOwner.HP == potionOwner.MaxHP))
+        else if (addHP > potionOwner.MaxHP && potionOwner.PotionsAvailable > 0)
         {
             Console.ForegroundColor = ConsoleColor.DarkRed;
-            Console.WriteLine("Your HP are already maxed out. No further increase is possible.");
+            int pointsToMax = potionOwner.MaxHP - potionOwner.HP;
+            Console.WriteLine($"{potionOwner.Name} only gained {pointsToMax} HP. Their HP are already maxed out. No further increase is possible right now.");
+            potionOwner.HP = potionOwner.MaxHP;
+            potionOwner.PotionsAvailable--;
             Console.ResetColor();
             return potionOwner.HP;
         }
