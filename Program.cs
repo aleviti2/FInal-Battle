@@ -11,14 +11,6 @@ gameEngine.ChooseHeroes();
 party.AllCharactersList = party.MergeLists(party.HeroesParty, party.MonstersParty);
 gameEngine.InitializeBattleSeries();
 
-//foreach (ICharacter character in party.MonstersParty)
-//{
-//    Console.WriteLine($"Character Name: {character.CharacterCategory}, HP: {character.HP}");
-//}
-//foreach (ICharacter character in party.HeroesParty)
-//{
-//    Console.WriteLine($"Character Name: {character.Name}, HP: {character.HP}");
-//}
 
 gameEngine.CreateTurnList();
 

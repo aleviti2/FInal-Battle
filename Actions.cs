@@ -19,7 +19,7 @@ public class Punch : IAction
     {
         int newHP =characterHit.HP - HPInflicted;
         Console.ForegroundColor = ConsoleColor.DarkRed;
-        Console.WriteLine($"{attacker.Name} has landed a Punch, dealing {HPInflicted} points of damage to {characterHit}'s health.");
+        Console.WriteLine($"{attacker.Name} has landed a Punch, dealing {HPInflicted} points of damage to {characterHit.Name}'s health.");
         Console.ResetColor();
         return newHP;
     }
@@ -37,7 +37,7 @@ public class BoneCrunch : IAction
         HPInflicted = random.Next(3, 11);
         int newHP = characterHit.HP - HPInflicted;
         Console.ForegroundColor = ConsoleColor.DarkRed;
-        Console.WriteLine($"{attacker.Name} has landed a Bone Crunch, dealing {HPInflicted} points of damage to {characterHit}'s health.");
+        Console.WriteLine($"{attacker.Name} has landed a Bone Crunch, dealing {HPInflicted} points of damage to {characterHit.Name}'s health.");
         Console.ResetColor();
         return newHP;
     }
@@ -54,7 +54,7 @@ public class Claw : IAction
         HPInflicted = random.Next(5, 15);
         int newHP = characterHit.HP - HPInflicted;
         Console.ForegroundColor = ConsoleColor.DarkRed;
-        Console.WriteLine($"{attacker.Name} has landed a Claw, dealing {HPInflicted} points of damage to {characterHit}'s health.");
+        Console.WriteLine($"{attacker.Name} has landed a Claw, dealing {HPInflicted} points of damage to {characterHit.Name}'s health.");
         Console.ResetColor();
         return newHP;
         //int newHP = characterHit.HP - HPInflicted;
